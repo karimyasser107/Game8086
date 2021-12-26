@@ -28,6 +28,26 @@ player_looses_disp db ' is Looser ;(','$'
 ;message to return to main menu
 enterKey_to_return_main_menu db  'Enter key to return to main menu','$'
 
+semicolumn db ':','$'
+;vars for processor 1
+reg_Ax_1 db 4,4,4 dup('0'),'$'
+reg_Bx_1 db 4,4,4 dup('0'),'$'
+reg_Cx_1 db 4,4,4 dup('0'),'$'
+reg_Dx_1 db 4,4,4 dup('0'),'$'
+reg_SI_1 db 4,4,4 dup('0'),'$'
+reg_DI_1 db 4,4,4 dup('0'),'$'
+reg_SP_1 db 4,4,4 dup('0'),'$'
+reg_BP_1 db 4,4,4 dup('0'),'$'
+;vars for processor 2
+reg_Ax_2 db 4,4,4 dup('0'),'$'
+reg_Bx_2 db 4,4,4 dup('0'),'$'
+reg_Cx_2 db 4,4,4 dup('0'),'$'
+reg_Dx_2 db 4,4,4 dup('0'),'$'
+reg_SI_2 db 4,4,4 dup('0'),'$'
+reg_DI_2 db 4,4,4 dup('0'),'$'
+reg_SP_2 db 4,4,4 dup('0'),'$'
+reg_BP_2 db 4,4,4 dup('0'),'$'
+
 
 ;ky try check github
 .code 
@@ -202,7 +222,7 @@ jz Chatting_Mode
 mov bl,2eh;ky changed 3ch to 2eh compatible withe emu
 cmp ah,bl  
 
-jz game_mode
+jmp game_mode ;################################################################ make it jz (i made it jmp only to run and debug)
 
 mov bl,1bh
 cmp ah,bl 
@@ -443,10 +463,53 @@ int 21h
         
         gamemodesetup proc
           
-      mov ah, 0      ;graphics mode       28 h x 19 h
+      mov ah, 0      ;graphics mode        size    320d x 200d   pixels
       mov al, 13h
       int 10h        
       
+      mov cx,160d ;########################################################################### print vertical sep line
+      mov dx,0
+      mov al,0fh
+      mov ah,0ch
+      back_to_draw_line:int 10h
+                        inc dx
+                        cmp dx,175d
+                        jnz back_to_draw_line
+      mov cx,0d ;################################################################################ print horizontal sep line
+      mov dx,175d
+      mov al,0fh
+      mov ah,0ch
+      back_to_draw_inline_chat_lines:int 10h
+                        inc cx
+                        cmp cx,320d
+                        jnz back_to_draw_inline_chat_lines  
+      
+       ;#####################################################print names
+      mov ah,2h ;name 1 print
+      mov bx,0h  
+      mov dx,3020h
+      int 10h
+      mov ah,9
+      Lea dx, [name1+2]
+      int 21h
+
+      mov ah,9               ;disp :
+      lea dx, semicolumn
+      int 21h
+
+      mov ah,2h ;name2 print
+      mov bx,0h  
+      mov dx,3120h
+      int 10h
+      mov ah,9
+      Lea dx, [name2+2]
+      int 21h
+
+      mov ah,9               ;disp :
+      lea dx, semicolumn
+      int 21h
+      
+      ;check points to choose the smaller points for both players
       mov al,pts1+2
       mov ah,pts2+2
       cmp ah,al         
@@ -466,18 +529,18 @@ int 21h
                                   mov [pts2+2],al
                     
       finished_total_points:
-      call gameflow
+      ;call gameflow ####################################################################################   uncomment later
       
                         
-      mov ah,2     ;move cursor to the middle of the screen  
-      mov bx,0h  ;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
-      mov dx,3026h
-      int 10h                  
+      ;mov ah,2     ;move cursor to the middle of the screen    ;################    commented because no need it is just example of int 10/0eh
+      ;mov bx,0h  ;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+      ;mov dx,3026h
+      ;int 10h                  
             
-      mov ah,0eh    ;int to print char in graphical mode
-      mov al,'2'  
-      mov bl, 0eh   
-      int 10h
+      ;mov ah,0eh    ;int to print char in graphical mode
+      ;mov al,'2'  
+      ;mov bl, 0eh   
+      ;int 10h
       
     
     ret
