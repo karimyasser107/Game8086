@@ -1,6 +1,7 @@
 .model small
+.386
 .stack 64
-.data 
+.DATA
 mes1 db 'Please enter your name:','$'
 points db 'Initial points:','$'
 mes2 db  'Please press enter to continue','$'
@@ -27,8 +28,9 @@ player_looses_disp db ' is Looser ;(','$'
 ;message to return to main menu
 enterKey_to_return_main_menu db  'Enter key to return to main menu','$'
 
+
 ;ky try check github
-.code
+.code 
 main      proc far 
           mov ax , @data
           mov ds,ax
@@ -37,20 +39,20 @@ main      proc far
      call clear
 StartOfCode:          
 mov ah,9           ; display message for entering name
-mov dx,offset mes1
+LEA dx, mes1
 int 21h 
 
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h  
 
                     ; for entering name of user
 mov ah,0Ah
-mov dx,offset name1
+LEA dx, name1
 int 21h 
 
 mov ch,[name1+1] ; the actual size of the name 
-mov si , offset [name1+2] ; the 1st letter of the name
+LEA si,[name1+2] ; the 1st letter of the name
 
   call Checks_For_Name_1       ;Checks that name1 does not contain any digits or special characters
 
@@ -63,15 +65,15 @@ jmp continue
 ; to display a message if name contain a number
 ContainANumber:
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h
 
 mov ah,9            
-mov dx,offset Contain_Digit_Mess
+LEA dx, Contain_Digit_Mess
 int 21h
 
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h
 
 jmp StartOfCode
@@ -80,15 +82,15 @@ jmp StartOfCode
 
 containAspecial:
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h
        
 mov ah,9            
-mov dx,offset Contain_Special_Mess
+LEA dx, Contain_Special_Mess
 int 21h
 
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h
 
 jmp StartOfCode       
@@ -114,7 +116,7 @@ startOfCode2:
      call newline1 
                          ; for entering name of user 2
      mov ah,0Ah
-     mov dx,offset name2
+     LEA dx, name2
      int 21h     
      
      call Checks_For_Name_2  ;checks that name2 does not contain any didits or special characters
@@ -125,15 +127,15 @@ startOfCode2:
 ; to display a message if name contain a number
 ContainANumber2:
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h
 
 mov ah,9            
-mov dx,offset Contain_Digit_Mess
+LEA dx, Contain_Digit_Mess
 int 21h
 
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h
 
 jmp StartOfCode2
@@ -142,15 +144,15 @@ jmp StartOfCode2
 
 containAspecial2:
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h
        
 mov ah,9            
-mov dx,offset Contain_Special_Mess
+LEA dx, Contain_Special_Mess
 int 21h
 
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h
 
 jmp StartOfCode2       
@@ -167,7 +169,7 @@ continue2:
      call newline1      
      
      mov ah,0Ah         ; for entering initial points
-     mov dx,offset pts2
+     LEA dx, pts2
      int 21h     
      
      call newline1
@@ -212,7 +214,7 @@ call print_sameX_incY
 
 
 mov ah,9           ; display error message
-mov dx,offset ErrorJumpKey
+LEA dx, ErrorJumpKey
 int 21h
 mov ax,0 
 
@@ -237,7 +239,8 @@ jmp Get_key
         
  end_program:
   
-     hlt                 
+     hlt   
+     ENDP              
                          
               ;////////////////// 
               
@@ -263,7 +266,7 @@ cmp ah,bl
                    
                    
 mov ah,9           ; display message'Press enter key to continue'
-mov dx,offset mes2
+LEA dx, mes2
 int 21h   
 
       ret
@@ -275,7 +278,7 @@ int 21h
       enter_initial_points proc           
                  
 mov ah,0Ah         ; for entering initial points
-mov dx,offset pts1
+LEA dx, pts1
 int 21h
          
       ret
@@ -288,7 +291,7 @@ int 21h
     disp_intial_points proc    
                  
  mov ah,9           ; display message for entering initial points
-mov dx,offset points
+LEA dx, points
 int 21h 
                 
              
@@ -301,7 +304,7 @@ int 21h
      enterusername proc 
                                 ; for entering name of user
 mov ah,0Ah
-mov dx,offset name1
+LEA dx, name1
 int 21h 
           
              
@@ -314,7 +317,7 @@ int 21h
                    
     newline1 proc        
 mov ah,9            ; for new line
-mov dx,offset newline
+LEA dx, newline
 int 21h  
             
             
@@ -328,7 +331,7 @@ int 21h
     dispname proc   
              
  mov ah,9           ; display message for entering name
-mov dx,offset mes1
+LEA dx, mes1
 int 21h 
          ret
      
@@ -396,7 +399,7 @@ print_Middle_graphic_screen  proc
     
                  
 mov ah,9            
-mov dx,offset chatting
+LEA dx, chatting
 int 21h  
        
 
@@ -404,14 +407,14 @@ call print_sameX_incY                  ;kkkkkkkkkkkkkkkkkkkkkkkkkkkk
 
 
 mov ah,9            
-mov dx,offset game
+LEA dx, game
 int 21h     
 
 call print_sameX_incY                  ;kkkkkkkkkkkkkkkkkkkkkkkkkkkk
 
 
 mov ah,9            
-mov dx,offset endprogram
+LEA dx, endprogram
 int 21h   
                     
                     
@@ -523,12 +526,12 @@ int 21h
             
             
             mov ah,9           ; display winner: player 2 name 
-            mov dx,offset name2+2
+            LEA dx, name2+2
             int 21h
             mov ax,0 
             
             mov ah,9           ; display winner message
-            mov dx,offset player_wins_disp+2
+            LEA dx, player_wins_disp+2
             int 21h
             mov ax,0     
                    
@@ -536,17 +539,17 @@ int 21h
             call  print_sameX_incY
             
             mov ah,9           ; display winner: player 2 name 
-            mov dx,offset name2+2
+            LEA dx, name2+2
             int 21h
             mov ax,0
             
              mov ah,9           ; display winner: player 2  points remaining
-            mov dx,offset pts2+2
+            LEA dx, pts2+2
             int 21h
             mov ax,0            
             
             mov ah,9           ; display word 'points' 
-            mov dx,offset player_points_disp+2
+            LEA dx, player_points_disp+2
             int 21h
             mov ax,0 
             
@@ -555,12 +558,12 @@ int 21h
             call  print_sameX_incY
             
             mov ah,9           ; display looser: player 1 name 
-            mov dx,offset name1+2
+            LEA dx, name1+2
             int 21h
             mov ax,0 
             
             mov ah,9           ; display looser message
-            mov dx,offset player_looses_disp+2
+            LEA dx, player_looses_disp+2
             int 21h
             mov ax,0     
                    
@@ -568,7 +571,7 @@ int 21h
             call  print_sameX_incY  
             
             mov ah,9           ; display looserr: player 1 name 
-            mov dx,offset name1+2
+            LEA dx, name1+2
             int 21h
             mov ax,0
             
@@ -578,7 +581,7 @@ int 21h
             mov ax,0  
             
             mov ah,9           ; display word 'points' 
-            mov dx,offset player_points_disp+2
+            LEA dx, player_points_disp+2
             int 21h
             mov ax,0            
             
@@ -589,7 +592,7 @@ int 21h
               
             
             mov ah,9           ; display enterKey_to_return_main_menu
-            mov dx,offset enterKey_to_return_main_menu+2
+            LEA dx, enterKey_to_return_main_menu+2
             int 21h
             mov ax,0       
             
@@ -617,12 +620,12 @@ int 21h
             
             
             mov ah,9           ; display winner: player 1 name 
-            mov dx,offset name1+2
+            LEA dx, name1+2
             int 21h
             mov ax,0 
             
             mov ah,9           ; display winner message
-            mov dx,offset player_wins_disp+2
+            LEA dx, player_wins_disp+2
             int 21h
             mov ax,0     
                    
@@ -630,17 +633,17 @@ int 21h
             call  print_sameX_incY
             
             mov ah,9           ; display winner: player 1 name 
-            mov dx,offset name1+2
+            LEA dx, name1+2
             int 21h
             mov ax,0
             
              mov ah,9           ; display winner: player 1  points remaining
-            mov dx,offset pts1+2
+            LEA dx, pts1+2
             int 21h
             mov ax,0            
             
             mov ah,9           ; display word 'points' 
-            mov dx,offset player_points_disp+2
+            LEA dx, player_points_disp+2
             int 21h
             mov ax,0 
             
@@ -649,12 +652,12 @@ int 21h
             call  print_sameX_incY
             
             mov ah,9           ; display looser: player 2 name 
-            mov dx,offset name2+2
+            LEA dx, name2+2
             int 21h
             mov ax,0 
             
             mov ah,9           ; display looser message
-            mov dx,offset player_looses_disp+2
+            LEA dx, player_looses_disp+2
             int 21h
             mov ax,0     
                    
@@ -662,7 +665,7 @@ int 21h
             call  print_sameX_incY  
             
             mov ah,9           ; display looserr: player 2 name 
-            mov dx,offset name2+2
+            LEA dx, name2+2
             int 21h
             mov ax,0
             
@@ -672,7 +675,7 @@ int 21h
             mov ax,0  
             
             mov ah,9           ; display word 'points' 
-            mov dx,offset player_points_disp+2
+            LEA dx, player_points_disp+2
             int 21h
             mov ax,0            
             
@@ -682,7 +685,7 @@ int 21h
              
             
             mov ah,9           ; display enterKey_to_return_main_menu
-            mov dx,offset enterKey_to_return_main_menu+2
+            LEA dx, enterKey_to_return_main_menu+2
             int 21h
             mov ax,0       
             
@@ -719,7 +722,7 @@ Jnz loop1
 
 ;to check if name contain a special character
 mov ch,[name1+1]
-mov si , offset [name1+2]
+LEA si ,  [name1+2]
 
 loop3:
 mov bl,21h ; the special character=!
@@ -737,7 +740,7 @@ dec ch
 jnz loop3 
 
 mov ch,[name1+1]
-mov si , offset [name1+2]
+LEA si ,  [name1+2]
 
 loop5:
 mov bl,3Ah  ;special character = :
@@ -755,7 +758,7 @@ dec ch
 jnz loop5
 
 mov ch,[name1+1]
-mov si , offset [name1+2]
+LEA si ,  [name1+2]
 
 loop7:
 mov bl,5Bh ;special character=[
@@ -773,7 +776,7 @@ dec ch
 jnz loop7 
 
 mov ch,[name1+1]
-mov si , offset [name1+2]
+LEA si ,  [name1+2]
 
 
 loop9:
@@ -797,7 +800,7 @@ jnz loop9
 Checks_For_Name_2  proc
     
     mov ch,[name2+1] ; the actual size of the name 
-mov si , offset [name2+2] ; the 1st letter of the name
+LEA si ,  [name2+2] ; the 1st letter of the name
 
 ; to check if name contain a number or not  
 loop12:
@@ -817,7 +820,7 @@ Jnz loop12
 
 ;to check if name contain a special character
 mov ch,[name2+1]
-mov si , offset [name2+2]
+LEA si ,  [name2+2]
 
 loop32:
 mov bl,21h ; the special character=!
@@ -836,7 +839,7 @@ dec ch
 jnz loop32 
 
 mov ch,[name2+1]
-mov si , offset [name2+2]
+LEA si ,  [name2+2]
 
 loop52:
 mov bl,3Ah  ;special character = :
@@ -854,7 +857,7 @@ dec ch
 jnz loop52
 
 mov ch,[name2+1]
-mov si , offset [name2+2]
+LEA si ,  [name2+2]
 
 loop7_2:
 mov bl,5Bh ;special character=[
@@ -872,7 +875,7 @@ dec ch
 jnz loop7_2 
 
 mov ch,[name2+1]
-mov si , offset [name2+2]
+LEA si ,  [name2+2]
 
 
 loop92:
