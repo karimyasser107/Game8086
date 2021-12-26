@@ -475,6 +475,40 @@ int 21h
                         inc dx
                         cmp dx,175d
                         jnz back_to_draw_line
+                        
+      mov cx,145d ;########################################################################### print vertical sep line for memoryyyy_1
+      mov dx,0
+      mov al,0fh
+      mov ah,0ch
+      back_to_draw_line_memory_1:int 10h
+                        inc dx
+                        cmp dx,175d
+                        jnz back_to_draw_line_memory_1
+      mov cx,130d ;########################################################################### print vertical sep line for memoryyy_1_1
+      mov dx,0
+      mov al,0fh
+      mov ah,0ch
+      back_to_draw_line_memory_1_1:int 10h
+                        inc dx
+                        cmp dx,175d
+                        jnz back_to_draw_line_memory_1_1
+      mov cx,305d ;########################################################################### print vertical sep line for memoryyyy_2
+      mov dx,0
+      mov al,0fh
+      mov ah,0ch
+      back_to_draw_line_memory_2:int 10h
+                        inc dx
+                        cmp dx,175d
+                        jnz back_to_draw_line_memory_2
+      mov cx,290d ;########################################################################### print vertical sep line for memoryyyy_2_2
+      mov dx,0
+      mov al,0fh
+      mov ah,0ch
+      back_to_draw_line_memory_2_2:int 10h
+                        inc dx
+                        cmp dx,175d
+                        jnz back_to_draw_line_memory_2_2                     
+                        
       mov cx,0d ;################################################################################ print horizontal sep line
       mov dx,175d
       mov al,0fh
