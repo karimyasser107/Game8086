@@ -8,7 +8,7 @@ mes2 db  'Please press enter to continue','$'
 chatting db 'To start chatting Press F1','$'
 game     db 'To start the game Press F2','$'
 endprogram db 'To end the program press ESC','$'
-ErrorJumpKey db 'Please enter a correct chice:','$'
+ErrorJumpKey db 'Please enter a correct choice:','$'
 Contain_Digit_Mess db 'Name can not contain Digits:','$'
 contain_Special_Mess db 'Name can not contain Special characters:','$'
 separate  db  80 dup('-'),'$'
@@ -26,7 +26,13 @@ player_points_disp db ' Points','$'
 player_looses_disp db ' is Looser ;(','$'
 
 ;message to return to main menu
-enterKey_to_return_main_menu db  'Enter key to return to main menu','$'
+enterKey_to_return_main_menu db  'Enter key to return to main menu','$'  
+f1                     db  61
+f2                     db  60   
+;message for level menu
+Level1     db  'For Level 1 Press f1','$'
+Level2     db  'For Level 2 press f2','$'
+
 
 semicolumn db ':','$'
 ;vars for processor 1
@@ -210,24 +216,26 @@ continue2:
      
 Get_key:
 
-mov ah,0   ;Get key pressed 
-int 16h
-mov bl,09h
-cmp al,bl
-mov bl,0 
-mov al,0 
+mov            ah,0
+ int            16h
 
-jz Chatting_Mode
 
-mov bl,2eh;ky changed 3ch to 2eh compatible withe emu
-cmp ah,bl  
+cmp            ah,f1  
+ jz Chatting_Mode
+	                           
+ jnz            CHECK_F2
 
-jmp game_mode ;################################################################ make it jz (i made it jmp only to run and debug)
+  CHECK_F2:                  
+cmp            ah,f2  
+jz game_mode
+jnz            CHECK_ESC
+							   
+CHECK_ESC: 
 
-mov bl,1bh
-cmp ah,bl 
-
+mov bl,01h
+cmp ah,bl
 jz end_program
+
 
         
 call print_sameX_incY
@@ -249,8 +257,8 @@ jmp Get_key
      
  game_mode:
      
-     call clear 
-     call gamemodesetup     ;ky
+    call clear     
+     call choose_level     ;ky
      ;call print_sameX_incY
      ;call dispname                    
      ;call newline1 
@@ -443,7 +451,77 @@ int 21h
    display_main_menu_functionalities endp  
    
    
-    ;//////////////////
+   ;////////////////// sondos      
+    
+        display_level_menu_functionalities  proc
+    
+    
+                 
+mov ah,9            
+mov dx,offset level1
+int 21h  
+       
+
+call print_sameX_incY                  
+
+
+mov ah,9            
+mov dx,offset level2
+int 21h     
+
+call print_sameX_incY                  
+
+
+mov ah,9            
+mov dx,offset endprogram
+int 21h   
+                    
+                    
+                 ret
+     
+   display_level_menu_functionalities endp  
+   ;////////////////////////////////////////////////////////////////////////  sondos
+   
+ choose_level  proc    
+    
+    level_menu:
+ 
+     call clear
+     call  print_firstx
+     call display_level_menu_functionalities
+     
+Get_key_2:
+
+ mov            ah,0
+ int            16h
+
+
+cmp            ah,f1  
+ jz level_1
+	                           
+ jnz            CHECK_F2_2
+
+
+CHECK_F2_2:                  
+cmp            ah,f2  
+jz level_2
+jnz            CHECK_ESC_2
+							   
+CHECK_ESC_2: 
+
+mov bl,01h
+cmp ah,bl
+jz end_program   
+
+level_1:
+call gamemodesetup  
+level_2:
+hlt
+
+            ret
+     
+   choose_level endp 
+    ;///////////////////////////////////////////////////
    
    
    print_sameX_incY PROC 
