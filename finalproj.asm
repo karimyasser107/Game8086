@@ -35,25 +35,93 @@ Level2     db  'For Level 2 press f2','$'
 
 
 semicolumn db ':','$'
-;vars for processor 1
-reg_Ax_1 db 4,4,4 dup('0'),'$'
-reg_Bx_1 db 4,4,4 dup('0'),'$'
-reg_Cx_1 db 4,4,4 dup('0'),'$'
-reg_Dx_1 db 4,4,4 dup('0'),'$'
-reg_SI_1 db 4,4,4 dup('0'),'$'
-reg_DI_1 db 4,4,4 dup('0'),'$'
-reg_SP_1 db 4,4,4 dup('0'),'$'
-reg_BP_1 db 4,4,4 dup('0'),'$'
-;vars for processor 2
-reg_Ax_2 db 4,4,4 dup('0'),'$'
-reg_Bx_2 db 4,4,4 dup('0'),'$'
-reg_Cx_2 db 4,4,4 dup('0'),'$'
-reg_Dx_2 db 4,4,4 dup('0'),'$'
-reg_SI_2 db 4,4,4 dup('0'),'$'
-reg_DI_2 db 4,4,4 dup('0'),'$'
-reg_SP_2 db 4,4,4 dup('0'),'$'
-reg_BP_2 db 4,4,4 dup('0'),'$'
+;vars for processor 1 (NECESSARY for input and output ONLY)
+reg_Ax_1 db 5,?,5 dup('0'),'$'
+reg_Bx_1 db 5,?,5  dup('0'),'$'
+reg_Cx_1 db 5,?,5  dup('0'),'$'
+reg_Dx_1 db 5,?,5  dup('0'),'$'
+reg_SI_1 db 5,?,5  dup('0'),'$'
+reg_DI_1 db 5,?,5  dup('0'),'$'
+reg_SP_1 db 5,?,5  dup('0'),'$'
+reg_BP_1 db 5,?,5  dup('0'),'$'
+;vars for processor 2 (NECESSARY for input and output ONLY)
+reg_Ax_2 db 5,?,5  dup('0'),'$'
+reg_Bx_2 db 5,?,5  dup('0'),'$'
+reg_Cx_2 db 5,?,5  dup('0'),'$'
+reg_Dx_2 db 5,?,5  dup('0'),'$'
+reg_SI_2 db 5,?,5  dup('0'),'$'
+reg_DI_2 db 5,?,5  dup('0'),'$'
+reg_SP_2 db 5,?,5  dup('0'),'$'
+reg_BP_2 db 5,?,5  dup('0'),'$'
+;real vars for processor 1 
+real_reg_Ax_1 dw 0000h
+real_reg_Bx_1 dw 0000h
+real_reg_Cx_1 dw 0000h
+real_reg_Dx_1 dw 0000h
+real_reg_SI_1 dw 0000h
+real_reg_DI_1 dw 0000h
+real_reg_SP_1 dw 0000h
+real_reg_BP_1 dw 0000h
+;real vars for processor 2
+real_reg_Ax_2 dw 0000h
+real_reg_Bx_2 dw 0000h
+real_reg_Cx_2 dw 0000h
+real_reg_DX_2 dw 0000h
+real_reg_SI_2 dw 0000h
+real_reg_DI_2 dw 0000h
+real_reg_SP_2 dw 0000h
+real_reg_BP_2 dw 0000h
 
+;Vars for memory 1
+memory_0_1 db 3,?,3 dup('0'),'$'
+memory_1_1 db 3,?,3 dup('0'),'$'
+memory_2_1 db 3,?,3 dup('0'),'$'
+memory_3_1 db 3,?,3 dup('0'),'$'
+memory_4_1 db 3,?,3 dup('0'),'$'
+memory_5_1 db 3,?,3 dup('0'),'$'
+memory_6_1 db 3,?,3 dup('0'),'$'
+memory_7_1 db 3,?,3 dup('0'),'$'
+memory_8_1 db 3,?,3 dup('0'),'$'
+memory_9_1 db 3,?,3 dup('0'),'$'
+memory_A_1 db 3,?,3 dup('0'),'$'
+
+;real memory
+real_memory_0_1 db 00h 
+real_memory_1_1 db 00h
+real_memory_2_1 db 00h
+real_memory_3_1 db 00h
+real_memory_4_1 db 00h
+real_memory_5_1 db 00h
+real_memory_6_1 db 00h
+real_memory_7_1 db 00h
+real_memory_8_1 db 00h
+real_memory_9_1 db 00h
+real_memory_A_1 db 00h
+;Vars for memory 2
+memory_0_2 db 3,?,3 dup('0'),'$'
+memory_1_2 db 3,?,3 dup('0'),'$'
+memory_2_2 db 3,?,3 dup('0'),'$'
+memory_3_2 db 3,?,3 dup('0'),'$'
+memory_4_2 db 3,?,3 dup('0'),'$'
+memory_5_2 db 3,?,3 dup('0'),'$'
+memory_6_2 db 3,?,3 dup('0'),'$'
+memory_7_2 db 3,?,3 dup('0'),'$'
+memory_8_2 db 3,?,3 dup('0'),'$'
+memory_9_2 db 3,?,3 dup('0'),'$'
+memory_A_2 db 3,?,3 dup('0'),'$'
+
+;real memory
+real_memory_0_2 db 00h
+real_memory_1_2 db 00h
+real_memory_2_2 db 00h
+real_memory_3_2 db 00h
+real_memory_4_2 db 00h
+real_memory_5_2 db 00h
+real_memory_6_2 db 00h
+real_memory_7_2 db 00h
+real_memory_8_2 db 00h
+real_memory_9_2 db 00h
+real_memory_A_2 db 00h
 
 ;ky try check github
 .code 
@@ -547,55 +615,102 @@ hlt
       
       mov cx,160d ;########################################################################### print vertical sep line
       mov dx,0
-      mov al,0fh
+      mov al,05h
       mov ah,0ch
       back_to_draw_line:int 10h
                         inc dx
-                        cmp dx,175d
+                        cmp dx,176d
                         jnz back_to_draw_line
                         
       mov cx,145d ;########################################################################### print vertical sep line for memoryyyy_1
       mov dx,0
-      mov al,0fh
+      mov al,0eh
       mov ah,0ch
       back_to_draw_line_memory_1:int 10h
                         inc dx
-                        cmp dx,175d
+                        cmp dx,176d
                         jnz back_to_draw_line_memory_1
-      mov cx,130d ;########################################################################### print vertical sep line for memoryyy_1_1
+      mov cx,126d ;########################################################################### print vertical sep line for memoryyy_1_1
       mov dx,0
-      mov al,0fh
+      mov al,0eh
       mov ah,0ch
       back_to_draw_line_memory_1_1:int 10h
                         inc dx
-                        cmp dx,175d
+                        cmp dx,176d
                         jnz back_to_draw_line_memory_1_1
       mov cx,305d ;########################################################################### print vertical sep line for memoryyyy_2
       mov dx,0
-      mov al,0fh
+      mov al,0eh
       mov ah,0ch
       back_to_draw_line_memory_2:int 10h
                         inc dx
-                        cmp dx,175d
+                        cmp dx,176d
                         jnz back_to_draw_line_memory_2
-      mov cx,290d ;########################################################################### print vertical sep line for memoryyyy_2_2
+      mov cx,286d ;########################################################################### print vertical sep line for memoryyyy_2_2
       mov dx,0
-      mov al,0fh
+      mov al,0eh
       mov ah,0ch
       back_to_draw_line_memory_2_2:int 10h
                         inc dx
-                        cmp dx,175d
+                        cmp dx,176d
                         jnz back_to_draw_line_memory_2_2                     
                         
       mov cx,0d ;################################################################################ print horizontal sep line
-      mov dx,175d
-      mov al,0fh
+      mov dx,176d
+      mov al,05h
       mov ah,0ch
       back_to_draw_inline_chat_lines:int 10h
                         inc cx
                         cmp cx,320d
                         jnz back_to_draw_inline_chat_lines  
+                       
+
+      mov bl,10d  ;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& no. of line in the memory_1
+      mov dx,12d ;separation between 2 memory lines
+      loop_print_horiz_lines_memory_1:
       
+
+      mov cx,126d ;&&&&&&&&&&&&&&&&print horizontal sep line memory&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      
+      mov al,0eh
+      mov ah,0ch
+      back_to_draw_line_memory_horiz_1:int 10h
+                        inc cx
+                        cmp cx,145d
+                        jnz back_to_draw_line_memory_horiz_1
+        
+        add dx,16d
+        dec bl
+        jnz loop_print_horiz_lines_memory_1      
+
+        mov bl,10d  ;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& no. of line in the memory_2
+      mov dx,12d ;separation between 2 memory lines
+      loop_print_horiz_lines_memory_2:
+      
+
+      mov cx,286d ;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&print horizontal sep line memory
+      
+      mov al,0eh ;color white
+      mov ah,0ch
+      back_to_draw_line_memory_horiz_2:int 10h
+                        inc cx
+                        cmp cx,305d
+                        jnz back_to_draw_line_memory_horiz_2 
+        
+        add dx,16d
+        dec bl
+        jnz loop_print_horiz_lines_memory_2   
+
+        ;//print registers &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        
+     call print_registers_boxes 
+     call print_registers_names  
+     call print_memory_names
+     
+     call update_players_registers_values;to be removed and put it in gameflow
+     call print_register_values ;to be removed and put it in gameflow  
+     call update_players_memory_values ;;to be removed and put it in gameflow
+     call print_memory_values ;;to be removed and put it in gameflow
        ;#####################################################print names
       mov ah,2h ;name 1 print
       mov bx,0h  
@@ -677,6 +792,9 @@ hlt
                                             
                                             
                        continue_game_no_winner:
+		       call print_register_values
+                       call print_memory_values
+		       
                        ;game logic                     
         
                        ; trial to finish game
@@ -1067,16 +1185,779 @@ jnz loop102
 inc si
 dec ch
 jnz loop92
-    
-    
-    
-    
-    
-    
     ret
-    
-    
     Checks_For_Name_2  endp           
+;///////////////////////////////////////////////////////&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& ky
+
+    print_registers_boxes proc
+    ;///reg of player 1 
+    ;reg ax 1
+    mov ax,0c05h ; color purple (05)
+    mov cx,15d ;initial position (for reg Ax)
+        mov dx,12d 
+    cote1_reg_Ax_1:int 10h
+          inc cx
+          cmp cx,60d
+          jnz cote1_reg_Ax_1
+    
+    cote2_reg_Ax_1: int 10h
+           inc dx
+           cmp dx,28d
+           jnz cote2_reg_Ax_1
+    cote3_reg_Ax_1: int 10h        
+           dec cx
+           cmp cx,15d 
+           jnz cote3_reg_Ax_1
+    cote4_reg_Ax_1: int 10h
+           dec dx
+           cmp dx, 12d 
+           jnz cote4_reg_Ax_1   
+
+;reg bx 1
+     mov ax,0c05h ; color purple (05)
+    mov cx,15d ;initial position (for reg Ax)
+        mov dx,32d 
+    cote1_reg_bx_1:int 10h
+          inc cx
+          cmp cx,60d
+          jnz cote1_reg_bx_1
+    
+    cote2_reg_bx_1: int 10h
+           inc dx
+           cmp dx,48d
+           jnz cote2_reg_bx_1
+    cote3_reg_bx_1: int 10h        
+           dec cx
+           cmp cx,15d 
+           jnz cote3_reg_bx_1
+    cote4_reg_bx_1: int 10h
+           dec dx
+           cmp dx, 32d 
+           jnz cote4_reg_bx_1     
+
+;reg cx 1
+    mov ax,0c05h ; color purple (05)
+    mov cx,15d ;initial position (for reg Ax)
+        mov dx,52d 
+    cote1_reg_cx_1:int 10h
+          inc cx
+          cmp cx,60d
+          jnz  cote1_reg_cx_1
+    
+    cote2_reg_cx_1: int 10h
+           inc dx
+           cmp dx,68d
+           jnz cote2_reg_cx_1
+    cote3_reg_cx_1: int 10h        
+           dec cx
+           cmp cx,15d 
+           jnz cote3_reg_cx_1
+    cote4_reg_cx_1: int 10h
+           dec dx
+           cmp dx, 52d 
+           jnz cote4_reg_cx_1 
+
+;reg dx 1
+           mov ax,0c05h ; color purple (05)
+    mov cx,15d ;initial position (for reg Ax)
+        mov dx,72d 
+    cote1_reg_dx_1:int 10h
+          inc cx
+          cmp cx,60d
+          jnz cote1_reg_dx_1
+    
+    cote2_reg_dx_1: int 10h
+           inc dx
+           cmp dx,88d
+           jnz cote2_reg_dx_1
+    cote3_reg_dx_1: int 10h        
+           dec cx
+           cmp cx,15d 
+           jnz cote3_reg_dx_1
+    cote4_reg_dx_1: int 10h
+           dec dx
+           cmp dx, 72d 
+           jnz cote4_reg_dx_1  
+
+           
+;reg SI 1
+    mov ax,0c05h ; color purple (05)
+    mov cx,66d ;initial position (for reg Ax) box size: 45 w and 14 l
+        mov dx,12d 
+    cote1_reg_SI_1:int 10h
+          inc cx
+          cmp cx,111d
+          jnz cote1_reg_SI_1
+    
+    cote2_reg_SI_1: int 10h
+           inc dx
+           cmp dx,28d
+           jnz cote2_reg_SI_1
+    cote3_reg_SI_1: int 10h        
+           dec cx
+           cmp cx,66d 
+           jnz cote3_reg_SI_1
+    cote4_reg_SI_1: int 10h
+           dec dx
+           cmp dx, 12d 
+           jnz cote4_reg_SI_1   
+
+;reg DI 1
+     mov ax,0c05h ; color purple (05)
+    mov cx,66d ;initial position (for reg Ax)
+        mov dx,32d 
+    cote1_reg_DI_1:int 10h
+          inc cx
+          cmp cx,111d
+          jnz cote1_reg_DI_1
+    
+    cote2_reg_DI_1: int 10h
+           inc dx
+           cmp dx,48d
+           jnz cote2_reg_DI_1
+    cote3_reg_DI_1: int 10h        
+           dec cx
+           cmp cx,66d 
+           jnz cote3_reg_DI_1
+    cote4_reg_DI_1: int 10h
+           dec dx
+           cmp dx, 32d 
+           jnz cote4_reg_DI_1     
+
+;reg SP 1
+    mov ax,0c05h ; color purple (05)
+    mov cx,66d ;initial position (for reg Ax)
+        mov dx,52d 
+    cote1_reg_SP_1:int 10h
+          inc cx
+          cmp cx,111d
+          jnz  cote1_reg_SP_1
+    
+    cote2_reg_SP_1: int 10h
+           inc dx
+           cmp dx,68d
+           jnz cote2_reg_SP_1
+    cote3_reg_SP_1: int 10h        
+           dec cx
+           cmp cx,66d 
+           jnz cote3_reg_SP_1
+    cote4_reg_SP_1: int 10h
+           dec dx
+           cmp dx, 52d 
+           jnz cote4_reg_SP_1 
+
+;reg BP 1
+           mov ax,0c05h ; color purple (05)
+    mov cx,66d ;initial position (for reg Ax)
+        mov dx,72d 
+    cote1_reg_BP_1:int 10h
+          inc cx
+          cmp cx,111d
+          jnz cote1_reg_BP_1
+    
+    cote2_reg_BP_1: int 10h
+           inc dx
+           cmp dx,88d
+           jnz cote2_reg_BP_1
+    cote3_reg_BP_1: int 10h        
+           dec cx
+           cmp cx,66d 
+           jnz cote3_reg_BP_1
+    cote4_reg_BP_1: int 10h
+           dec dx
+           cmp dx, 72d 
+           jnz cote4_reg_BP_1
+
+
+    ;///reg of player 2 ///////////////
+;reg Ax 2
+    mov ax,0c05h ; color purple (05)
+    mov cx,180d ;initial position (for reg Ax) box size: 45 w and 14 l
+        mov dx,12d 
+    cote1_reg_Ax_2:int 10h
+          inc cx
+          cmp cx,225d
+          jnz cote1_reg_Ax_2
+    
+    cote2_reg_Ax_2: int 10h
+           inc dx
+           cmp dx,28d
+           jnz cote2_reg_Ax_2
+    cote3_reg_Ax_2: int 10h        
+           dec cx
+           cmp cx,180d 
+           jnz cote3_reg_Ax_2
+    cote4_reg_Ax_2: int 10h
+           dec dx
+           cmp dx, 12d 
+           jnz cote4_reg_Ax_2   
+
+;reg bx 2
+     mov ax,0c05h ; color purple (05)
+    mov cx,180d ;initial position (for reg Ax)
+        mov dx,32d 
+    cote1_reg_bx_2:int 10h
+          inc cx
+          cmp cx,225d
+          jnz cote1_reg_bx_2
+    
+    cote2_reg_bx_2: int 10h
+           inc dx
+           cmp dx,48d
+           jnz cote2_reg_bx_2
+    cote3_reg_bx_2: int 10h        
+           dec cx
+           cmp cx,180d 
+           jnz cote3_reg_bx_2
+    cote4_reg_bx_2: int 10h
+           dec dx
+           cmp dx, 32d 
+           jnz cote4_reg_bx_2     
+
+;reg cx 2
+    mov ax,0c05h ; color purple (05)
+    mov cx,180d ;initial position (for reg Ax)
+        mov dx,52d 
+    cote1_reg_cx_2:int 10h
+          inc cx
+          cmp cx,225d
+          jnz  cote1_reg_cx_2
+    
+    cote2_reg_cx_2: int 10h
+           inc dx
+           cmp dx,68d
+           jnz cote2_reg_cx_2
+    cote3_reg_cx_2: int 10h        
+           dec cx
+           cmp cx,180d 
+           jnz cote3_reg_cx_2
+    cote4_reg_cx_2: int 10h
+           dec dx
+           cmp dx, 52d 
+           jnz cote4_reg_cx_2 
+
+;reg dx 2
+           mov ax,0c05h ; color purple (05)
+    mov cx,180d ;initial position (for reg Ax)
+        mov dx,72d 
+    cote1_reg_dx_2:int 10h
+          inc cx
+          cmp cx,225d
+          jnz cote1_reg_dx_2
+    
+    cote2_reg_dx_2: int 10h
+           inc dx
+           cmp dx,88d
+           jnz cote2_reg_dx_2
+    cote3_reg_dx_2: int 10h        
+           dec cx
+           cmp cx,180d 
+           jnz cote3_reg_dx_2
+    cote4_reg_dx_2: int 10h
+           dec dx
+           cmp dx, 72d 
+           jnz cote4_reg_dx_2 
+;reg SI 2
+    mov ax,0c05h ; color purple (05)
+    mov cx,230d ;initial position (for reg Ax) box size: 45 w and 14 l
+        mov dx,12d 
+    cote1_reg_SI_2:int 10h
+          inc cx
+          cmp cx,275d
+          jnz cote1_reg_SI_2
+    
+    cote2_reg_SI_2: int 10h
+           inc dx
+           cmp dx,28d
+           jnz cote2_reg_SI_2
+    cote3_reg_SI_2: int 10h        
+           dec cx
+           cmp cx,230d 
+           jnz cote3_reg_SI_2
+    cote4_reg_SI_2: int 10h
+           dec dx
+           cmp dx, 12d 
+           jnz cote4_reg_SI_2   
+
+;reg DI 2
+     mov ax,0c05h ; color purple (05)
+    mov cx,230d ;initial position (for reg Ax)
+        mov dx,32d 
+    cote1_reg_DI_2:int 10h
+          inc cx
+          cmp cx,275d
+          jnz cote1_reg_DI_2
+    
+    cote2_reg_DI_2: int 10h
+           inc dx
+           cmp dx,48d
+           jnz cote2_reg_DI_2
+    cote3_reg_DI_2: int 10h        
+           dec cx
+           cmp cx,230d 
+           jnz cote3_reg_DI_2
+    cote4_reg_DI_2: int 10h
+           dec dx
+           cmp dx, 32d 
+           jnz cote4_reg_DI_2     
+
+;reg SP 2
+    mov ax,0c05h ; color purple (05)
+    mov cx,230d ;initial position (for reg Ax)
+        mov dx,52d 
+    cote1_reg_SP_2:int 10h
+          inc cx
+          cmp cx,275d
+          jnz  cote1_reg_SP_2
+    
+    cote2_reg_SP_2: int 10h
+           inc dx
+           cmp dx,68d
+           jnz cote2_reg_SP_2
+    cote3_reg_SP_2: int 10h        
+           dec cx
+           cmp cx,230d 
+           jnz cote3_reg_SP_2
+    cote4_reg_SP_2: int 10h
+           dec dx
+           cmp dx, 52d 
+           jnz cote4_reg_SP_2 
+
+;reg BP 2
+           mov ax,0c05h ; color purple (05)
+    mov cx,230d ;initial position (for reg Ax)
+        mov dx,72d 
+    cote1_reg_BP_2:int 10h
+          inc cx
+          cmp cx,275d
+          jnz cote1_reg_BP_2
+    
+    cote2_reg_BP_2: int 10h
+           inc dx
+           cmp dx,88d
+           jnz cote2_reg_BP_2
+    cote3_reg_BP_2: int 10h        
+           dec cx
+           cmp cx,230d 
+           jnz cote3_reg_BP_2
+    cote4_reg_BP_2: int 10h
+           dec dx
+           cmp dx, 72d 
+           jnz cote4_reg_BP_2
+           ret
+    print_registers_boxes endp  
+;///////////////////////////////////////ky
+print_registers_names proc
+;print names of regs. of both players 1 and 2
+;TO DO K.Y
+
+ret
+print_registers_names endp
+
+;///////////////////////////////////////ky
+print_memory_names proc
+;print names of memory of both players 1 and 2
+;TO DO K.Y
+
+ret
+print_memory_names endp
+
+;///////////////////////////////////////ky
+ update_players_registers_values proc
+;update values of registers of both players 1 and 2
+;TO DO K.Y
+       ;to print just first 4 digits replace the fifth by 0DH equivalent to 'Enter' key ascii
+       mov al,0Dh 
+       mov reg_Ax_1+6,al
+       mov al,0Dh 
+       mov reg_Bx_1+6,al
+       mov al,0Dh 
+       mov reg_Cx_1+6,al
+       mov al,0Dh 
+       mov reg_Dx_1+6,al
+       mov al,0Dh 
+       mov reg_Ax_2+6,al
+       mov al,0Dh 
+       mov reg_Bx_2+6,al
+       mov al,0Dh 
+       mov reg_Cx_2+6,al
+       mov al,0Dh 
+       mov reg_Dx_2+6,al
+       mov al,0Dh 
+       mov reg_SI_1+6,al
+       mov al,0Dh 
+       mov reg_DI_1+6,al
+       mov al,0Dh 
+       mov reg_SP_1+6,al
+       mov al,0Dh 
+       mov reg_BP_1+6,al
+       mov al,0Dh 
+       mov reg_SI_2+6,al
+       mov al,0Dh 
+       mov reg_DI_2+6,al
+       mov al,0Dh 
+       mov reg_SP_2+6,al
+       mov al,0Dh 
+       mov reg_BP_2+6,al
+;assign the value of first byte of reg Ax to the var 'reg_Ax_1' (this var is for output)     
+mov cx,real_reg_Ax_1 ;assume Ax_1= 12f5 h
+mov ah,00h
+mov al,ch ;higher part of reg Ax_1  --> 12h
+mov dl,10h
+div dl
+check_hexa_digit_letter_1:
+;complete***** k.y
+add al,30h            ;to transform it into ascii
+mov reg_Ax_1+2,al     ; al=31h --> =1d
+add ah,30h            ;to transform it into ascii
+mov reg_Ax_1+3,ah     ;ah=32h --> =2d
+
+mov ah,00h
+mov al,cl ;lower part of reg Ax_1  --> f5h
+mov dl,10h
+div dl
+add al,30h            ;to transform it into ascii
+mov reg_Ax_1+4,al     ; al=31h --> =1d
+add ah,30h            ;to transform it into ascii
+mov reg_Ax_1+5,ah     ;ah=35h --> =5d
+
+
+
+
+ret
+update_players_registers_values endp
+
+;///////////////////////////////////////ky
+ print_register_values proc
+
+;print values of regs. of both players 1 and 2
+;mov cursor to SI 1 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,3521h
+       int 10h
+       mov ah,9 ;print value of reg SI 1
+       lea dx,reg_SI_1+2 ;//done
+       int 21h
+;mov cursor to DX 1 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,2323h
+       int 10h
+       mov ah,9 ;print value of reg DX 1
+       lea dx,reg_Dx_1+2 ;//done
+       int 21h
+
+;mov cursor to BP 1 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,2301h
+       int 10h
+       mov ah,9 ;print value of reg BP 1
+       lea dx,reg_BP_1+2 ;//done
+       int 21h  
+
+;mov cursor to DI 1 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,0431h
+       int 10h
+       mov ah,9 ;print value of reg DI 1
+       lea dx,reg_DI_1+2 ;//DONE
+       int 21h
+
+;mov cursor to CX 1 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,0703h
+       int 10h
+       mov ah,9 ;print value of reg CX 1
+       lea dx,reg_Cx_1+2 ;//done
+       int 21h  
+
+;mov cursor to SP 1 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,2101h
+       int 10h
+       mov ah,9 ;print value of reg SP 1
+       lea dx,reg_SP_1+2 ;//done
+       int 21h   
+
+;mov cursor to BX 1 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,0503h
+       int 10h
+       mov ah,9 ;print value of reg BX 1
+       lea dx,reg_Bx_1+2; //done
+       int 21h      
+
+;mov cursor to AX 1 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,0203h
+       int 10h
+       mov ah,9 ;print value of reg AX 1
+       lea dx,reg_Ax_1+2 ;//done
+       int 21h    
+
+;REGS. 2 
+;mov cursor to DX 2 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,2338h
+       int 10h
+       mov ah,9 ;print value of reg DX 2
+       lea dx,reg_Dx_2+2 ;//done
+       int 21h
+
+;mov cursor to BP 2 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,2316h
+       int 10h
+       mov ah,9 ;print value of reg BP 2
+       lea dx,reg_BP_2+2 ;//done
+       int 21h
+
+       
+;mov cursor to BX 2 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,3808h
+       int 10h
+       mov ah,9 ;print value of reg BX 2
+       lea dx,reg_Bx_2+2 ;//done
+       int 21h
+
+;mov cursor to CX 2 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,2138h
+       int 10h
+       mov ah,9 ;print value of reg CX 2
+       lea dx,reg_Cx_2+2 ;//done
+       int 21h
+
+;mov cursor to AX 2 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,3508h
+       int 10h
+       mov ah,9 ;print value of reg AX 2
+       lea dx,reg_Ax_2+2 ;//done
+       int 21h
+
+;mov cursor to SI 2 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,3536h
+       int 10h
+       mov ah,9 ;print value of reg SI 2
+       lea dx,reg_SI_2+2 ;//DONE
+       int 21h
+
+;mov cursor to SP 2 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,2116h
+       int 10h
+       mov ah,9 ;print value of reg SP 2
+       lea dx,reg_SP_2+2 ;//done
+       int 21h
+
+;mov cursor to DI 2 reg box
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,3836h
+       int 10h
+       mov ah,9 ;print value of reg DI 2
+       lea dx,reg_DI_2+2 ;//done
+       int 21h
+ 
+ret
+print_register_values endp
+
+;///////////////////////////////////////ky
+ update_players_memory_values proc
+;update values of registers of both players 1 and 2
+;TO DO K.Y
+ ;to print just first 2 digits replace the third by 0DH equivalent to 'Enter' key ascii
+       mov al,0Dh 
+       mov memory_0_1+4,al
+       mov al,0Dh 
+       mov memory_1_1+4,al
+       mov al,0Dh 
+       mov memory_2_1+4,al
+       mov al,0Dh 
+       mov memory_3_1+4,al
+       mov al,0Dh 
+       mov memory_4_1+4,al
+       mov al,0Dh 
+       mov memory_5_1+4,al
+       mov al,0Dh 
+       mov memory_6_1+4,al
+       mov al,0Dh 
+       mov memory_7_1+4,al
+       mov al,0Dh 
+       mov memory_8_1+4,al
+       mov al,0Dh 
+       mov memory_9_1+4,al
+       mov al,0Dh 
+       mov memory_A_1+4,al
+       mov al,0Dh 
+       mov memory_0_2+4,al
+       mov al,0Dh 
+       mov memory_1_2+4,al
+       mov al,0Dh 
+       mov memory_2_2+4,al
+       mov al,0Dh 
+       mov memory_3_2+4,al
+       mov al,0Dh 
+       mov memory_4_2+4,al
+       mov al,0Dh 
+       mov memory_5_2+4,al
+       mov al,0Dh 
+       mov memory_6_2+4,al
+       mov al,0Dh 
+       mov memory_7_2+4,al
+       mov al,0Dh 
+       mov memory_8_2+4,al
+       mov al,0Dh 
+       mov memory_9_2+4,al
+       mov al,0Dh
+       mov memory_A_2+4,al
+
+                     ;complete***** k.y**************************************wednesday complete from k ragab's code
+ret
+update_players_memory_values endp
+
+;///////////////////////////////////////ky
+ print_memory_values proc
+;print values of memory of both players 1 and 2
+;TO DO K.Y
+;memory player 1
+       mov ah,2h ;
+       mov bx,0h  
+       mov dx,0010h
+       mov di,dx
+       int 10h
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_0_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_1_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_2_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_3_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_4_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_5_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_6_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_7_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_8_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_9_1+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_A_1+2 ;//done
+       int 21h
+;memory player 2
+mov ah,2h ;
+       mov bx,0h  
+       mov dx,0024h
+       mov di,dx
+       int 10h
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_0_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_1_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_2_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_3_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_4_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_5_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_6_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_7_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_8_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_9_2+2 ;//done
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       mov ah,9 ;print value of reg DI 2
+       lea dx,memory_A_2+2 ;//done
+       int 21h
+
+ret
+print_memory_values endp
       
 
      end main 
