@@ -124,6 +124,28 @@ real_memory_9_2 db 00h
 real_memory_A_2 db 00h
 
 ;ky try check github
+;;;;;;varibles for commands
+Mess_command db 'Please enter your command:','$'
+wrong_Command db 'This command is disallowed!!','$'
+Mess_Operand   db  'Enter your operand:','$'
+error_register   db  'Invalid register name:','$'
+Mess_operand_1  db  'Enter 1st operand:','$'
+Mess_operand_2   db  'Enter 2nd operand:','$'
+size_mismatch   db  'Size_Mismatch:','$'
+value_OR_register db  'value(v)orregister(r)?','$'
+Mess_value        db  'Enter your value:','$'
+
+command  db 5,?,5 dup('$')
+operand_1 db 5,?,5 dup('$')
+operand_2 db 5,?,5 dup('$')
+vORr      db 2,?,2 dup('$')
+value     db 5,?,5 dup('$')
+value2    db 3,?,3 dup('$')
+;carry flags
+Carry_Flag_1 db 1h
+carry_Flag_2 db 1h 
+
+
 .code 
 main      proc far 
           mov ax , @data
@@ -792,6 +814,7 @@ hlt
                                             
                                             
                        continue_game_no_winner:
+		       call function_taking_commands
 		       call print_register_values
                        call print_memory_values
 		       
@@ -1958,6 +1981,3841 @@ mov ah,2h ;
 
 ret
 print_memory_values endp
+
+function_taking_commands proc
+ start:
+        mov ah,9
+        mov dx,offset Mess_command
+        int 21h
+
+        ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset command
+        int 21h 
+ 
+     ; to convert command entered by the user into smallcase letters    
+    mov cl , [command+1]
+    mov si , offset [command+2]
+    mov bx , offset [command+2]
+    
+loop_1: 
+        Mov al, [bx]
+        mov dl , al
+        cmp dl , 32
+        je  space  
+        sub dl , 65
+        cmp dl ,25
+        jbe addition
+        jge noaddition
+        mov [si],al 
+        inc si
+        dec cl 
+        jnz loop_1 
+        jz en 
+      
+      
+ addition:
+ add al,32
+ mov [si] , al
+ inc bx 
+ inc si    
+ dec cl
+ jnz loop_1 
+ jz en
+ 
+ noaddition:
+ inc bx  
+ mov [si], al
+ inc si        
+ dec cl
+ jnz loop_1 
+ jz en
+
+ space:
+ inc bx 
+ mov [si] , al
+ inc si       
+ dec cl
+ jnz loop_1 
+ en:
+ 
+ mov si,offset [command+2]
+ ;check if first letter of command is 'n'
+ mov bl,6eh ; ascii of 'n'
+ cmp [si],bl
+ jz check_NOP
+ jnz check_2
+ 
+ 
+check_NOP:
+mov bl,6fh ;ascii of 'o'
+inc si
+cmp bl,[si]
+jnz error_command
+mov bl,70h   ;ascii of 'p'
+inc si
+cmp bl,[si]
+jnz error_command
+
+jmp continue
+
+;check if first letter of command is 'c'
+Check_2: 
+mov bl,63h ;ascii of 'c;
+cmp [si],bl
+jz check_CLC
+jnz check_3
+
+check_CLC:
+mov bl,6ch ;ascii of 'l'
+inc si
+cmp bl,[si]
+jnz error_command
+mov bl,63h ;ascii of 'c' 
+inc si
+cmp bl,[si]
+jnz error_command
+
+;logic of clc
+mov carry_flag_2,0
+
+jmp continue
+
+; check if first letter of command is 's'
+check_3:
+mov bl,73h ; ascii of 's'
+cmp [si],bl
+jz check_SUB_SBB_SHL_SHR
+jnz check_4
+
+check_SUB_SBB_SHL_SHR:
+mov bl,75h   ; ascii of 'u'
+inc si 
+cmp bl,[si]
+jz continuecompare_1
+jnz anothercompare_1
+
+continuecompare_1:
+mov bl,62h     ;ascii of 'b'
+inc si
+cmp bl,[si]
+jz sub_logic 
+jnz error_command
+
+anothercompare_1:
+mov bl,62h     ;ascii of 'b'
+cmp bl,[si]
+jz  continuecompare_2
+jnz anothercompare_2
+
+continuecompare_2:
+mov bl,62h     ;ascii of 'b'
+inc si
+cmp bl,[si]
+jz continue 
+jnz error_command
+
+anothercompare_2:
+mov bl,68h  ;ascii of 'h'
+cmp bl,[si]
+jz continuecompare_3
+jnz error_command
+
+continuecompare_3:
+mov bl,6ch ;ascii of 'l'
+inc si
+cmp bl,[si]
+jz continue 
+jnz anothercompare_3
+anothercompare_3:
+mov bl,72h
+cmp bl,[si]
+jz continue 
+jnz error_command
+
+; check if the first letter of the command is 'i'
+check_4:
+mov bl,69h ;ascii of 'i'
+cmp bl,[si]
+jz check_INC
+jnz check_5
+
+check_INC:
+mov bl,6eh  ;ascii of 'n'
+inc si
+cmp bl,[si]
+jnz error_command
+mov bl,63h ;ascii of 'c'
+inc si
+cmp bl,[si]
+jnz error_command
+jz getregistername_INC
+
+
+check_5:
+mov bl,64h ;ascii of 'd'
+cmp bl,[si]
+jz check_DEC
+;jnz check_6
+
+check_DEC:
+mov bl,65h ;ascii of 'e'
+inc si
+cmp bl,[si]
+jnz error_command
+mov bl,63h  ;ascii of 'c'
+inc si
+cmp bl,[si]
+jnz error_command
+jz getregistername_dec 
+           
+                     
+
+;check_6:
+
+
+ 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Command_INC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+getRegisterName_INC:          
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ 
+ mov ah,9
+ mov dx,offset Mess_operand
+ int 21h 
+ 
+ 
+ ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset operand_1
+        int 21h
+ 
+Logic_INC:
+
+;check if register is ax or al or ah         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,61h  ;ascii of a 
+cmp bl,[si]
+jz AX_check
+jnz another_register_name_check_1
+
+
+Ax_check:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz inc_Ax
+jnz another_compare_of_ax_1
+
+inc_Ax:
+mov ax,real_reg_Ax_2
+inc ax
+mov real_reg_Ax_2,ax 
+jmp continue 
+
+another_compare_of_ax_1:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz inc_Ah
+jnz another_compare_of_ax_2
+
+inc_Ah:
+mov ax,real_reg_Ax_2+1
+inc ax
+mov real_reg_Ax_2+1,ax 
+ 
+jmp continue
+
+another_compare_of_ax_2:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz inc_Al
+jnz error_Register_name_INC
+
+inc_Al:
+mov al,byte ptr real_reg_Ax_2
+inc al
+mov byte ptr real_reg_Ax_2,al 
+jmp continue
+
+
+another_register_name_check_1:
+;check if register is bx or bl or bh         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,62h  ;ascii of b 
+cmp bl,[si]
+jz bX_check
+jnz another_register_name_check_2
+
+
+bx_check:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz inc_bx
+jnz another_compare_of_bx_1
+
+inc_bx:
+mov ax,real_reg_bx_2
+inc ax
+mov real_reg_bx_2,ax 
+jmp continue 
+
+another_compare_of_bx_1:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz inc_bh
+jnz another_compare_of_bx_2
+
+inc_bh:
+mov ax,real_reg_bx_2+1
+inc ax
+mov real_reg_bx_2+1,ax 
+ 
+jmp continue
+
+another_compare_of_bx_2:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz inc_bl
+jnz compare_BP
+
+inc_bl:
+mov al,byte ptr real_reg_bx_2
+inc al
+mov byte ptr real_reg_bx_2,al
+
+; to check if register is BP or not
+compare_BP:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz INC_BP
+jnz error_register_name_INC
+
+Inc_BP:
+mov ax,real_reg_bp_2
+inc ax
+mov real_reg_bp_2,ax
+jmp continue  
+ 
+another_register_name_check_2: 
+;check if register is cx or cl or ch         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,63h  ;ascii of c 
+cmp bl,[si]
+jz cX_check
+jnz another_register_name_check_3
+
+
+cx_check:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz inc_cx
+jnz another_compare_of_cx_1
+
+inc_cx:
+mov ax,real_reg_cx_2
+inc ax
+mov real_reg_cx_2,ax 
+jmp continue 
+
+another_compare_of_cx_1:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz inc_ch
+jnz another_compare_of_cx_2
+
+inc_ch:
+mov ax,real_reg_cx_2+1
+inc ax
+mov real_reg_cx_2+1,ax
+ 
+jmp continue
+
+another_compare_of_cx_2:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz inc_cl
+jnz error_Register_name_INC
+
+inc_cl:
+mov al,byte ptr real_reg_cx_2
+inc al
+mov byte ptr real_reg_cx_2,al
+
+jmp continue
+
+
+another_register_name_check_3:
+;check if register is dx or dl or dh         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,64h  ;ascii of d 
+cmp bl,[si]
+jz dX_check
+jnz another_register_name_check_4
+
+
+dx_check:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz inc_dx
+jnz another_compare_of_dx_1
+
+inc_dx:
+mov ax, real_reg_dx_2
+inc ax
+mov  real_reg_dx_2,ax 
+jmp continue 
+
+another_compare_of_dx_1:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz inc_dh
+jnz another_compare_of_dx_2
+
+inc_dh:
+mov ax,real_reg_dx_2+1
+inc ax
+mov real_reg_dx_2+1,ax
+ 
+jmp continue
+
+another_compare_of_dx_2:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz inc_dl
+jnz Compare_DI
+
+inc_dl:
+mov al,byte ptr real_reg_dx_2
+inc al
+mov byte ptr real_reg_dx_2,al
+jmp continue
+
+; to check if register is DI or not
+compare_DI:
+mov bl,69h ;ascii of p
+cmp bl,[si]
+jz INC_DI
+jnz error_register_name_INC
+
+Inc_DI:
+mov ax ,real_reg_di_2
+inc ax
+mov real_reg_di_2,ax
+jmp continue 
+
+another_register_name_check_4:
+mov bl,73h ; ascii of s
+cmp bl,[si]
+jz check_si
+jnz error_register_name_INC
+
+check_si:
+mov bl,69h ;ascii of i
+inc si
+cmp bl,[si]
+jz inc_si
+jnz check_sp
+
+inc_si:
+mov ax ,real_reg_si_2
+inc ax
+mov real_reg_si_2,ax
+jmp continue
+
+check_sp:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz inc_sp
+jnz error_register_name_INC
+
+inc_sp:
+mov ax ,real_reg_sp_2
+inc ax
+mov real_reg_sp_2,ax
+jmp continue
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Command_INC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                                                                                                     
+                                                                                                                     
+                                                                                                                     
+                                                                                                                     
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;command_Dec;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+getRegisterName_dec:          
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ 
+ mov ah,9
+ mov dx,offset Mess_operand
+ int 21h 
+ 
+ 
+ ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset operand_1
+        int 21h
+ 
+Logic_dec:
+
+;check if register is ax or al or ah         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,61h  ;ascii of a 
+cmp bl,[si]
+jz AX_check_2
+jnz another_register_name_check_1_2
+
+
+Ax_check_2:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz dec_Ax
+jnz another_compare_of_ax_1_2
+
+dec_Ax:
+mov ax,real_reg_Ax_2
+dec ax
+mov real_reg_Ax_2,ax 
+jmp continue 
+
+another_compare_of_ax_1_2:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz dec_Ah
+jnz another_compare_of_ax_2_2
+
+dec_Ah:
+mov ax,real_reg_Ax_2+1
+dec ax
+mov real_reg_Ax_2+1,ax 
+ 
+jmp continue
+
+another_compare_of_ax_2_2:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz dec_Al
+jnz error_Register_name_dec
+
+dec_Al:
+mov al,byte ptr real_reg_Ax_2
+dec al
+mov byte ptr real_reg_Ax_2,al 
+jmp continue
+
+
+another_register_name_check_1_2:
+;check if register is bx or bl or bh         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,62h  ;ascii of b 
+cmp bl,[si]
+jz bX_check_2
+jnz another_register_name_check_2_2
+
+
+bx_check_2:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz dec_bx
+jnz another_compare_of_bx_1_2
+
+dec_bx:
+mov ax,real_reg_bx_2
+dec ax
+mov real_reg_bx_2,ax 
+jmp continue 
+
+another_compare_of_bx_1_2:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz dec_bh
+jnz another_compare_of_bx_2_2
+
+dec_bh:
+mov ax,real_reg_bx_2+1
+dec ax
+mov real_reg_bx_2+1,ax 
+ 
+jmp continue
+
+another_compare_of_bx_2_2:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz dec_bl
+jnz compare_BP_2
+
+dec_bl:
+mov al,byte ptr real_reg_bx_2
+dec al
+mov byte ptr real_reg_bx_2,al
+
+; to check if register is BP or not
+compare_BP_2:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz dec_BP
+jnz error_register_name_dec
+
+dec_BP:
+mov ax,real_reg_bp_2
+dec ax
+mov real_reg_bp_2,ax
+jmp continue  
+ 
+another_register_name_check_2_2: 
+;check if register is cx or cl or ch         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,63h  ;ascii of c 
+cmp bl,[si]
+jz cX_check_2
+jnz another_register_name_check_3_2
+
+
+cx_check_2:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz dec_cx
+jnz another_compare_of_cx_1_2
+
+dec_cx:
+mov ax,real_reg_cx_2
+dec ax
+mov real_reg_cx_2,ax 
+jmp continue 
+
+another_compare_of_cx_1_2:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz dec_ch
+jnz another_compare_of_cx_2_2
+
+dec_ch:
+mov ax,real_reg_cx_2+1
+dec ax
+mov real_reg_cx_2+1,ax
+ 
+jmp continue
+
+another_compare_of_cx_2_2:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz dec_cl
+jnz error_Register_name_dec
+
+dec_cl:
+mov al,byte ptr real_reg_cx_2
+dec al
+mov byte ptr real_reg_cx_2,al
+
+jmp continue
+
+
+another_register_name_check_3_2:
+;check if register is dx or dl or dh         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,64h  ;ascii of d 
+cmp bl,[si]
+jz dX_check_2
+jnz another_register_name_check_4_2
+
+
+dx_check_2:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz dec_dx
+jnz another_compare_of_dx_1_2
+
+dec_dx:
+mov ax, real_reg_dx_2
+dec ax
+mov  real_reg_dx_2,ax 
+jmp continue 
+
+another_compare_of_dx_1_2:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz dec_dh
+jnz another_compare_of_dx_2_2
+
+dec_dh:
+mov ax,real_reg_dx_2+1
+dec ax
+mov real_reg_dx_2+1,ax
+ 
+jmp continue
+
+another_compare_of_dx_2_2:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz dec_dl
+jnz Compare_DI_2
+
+dec_dl:
+mov al,byte ptr real_reg_dx_2
+dec al
+mov byte ptr real_reg_dx_2,al
+jmp continue
+
+; to check if register is DI or not
+compare_DI_2:
+mov bl,69h ;ascii of p
+cmp bl,[si]
+jz dec_DI
+jnz error_register_name_dec
+
+dec_DI:
+mov ax ,real_reg_di_2
+dec ax
+mov real_reg_di_2,ax
+jmp continue 
+
+another_register_name_check_4_2:
+mov bl,73h ; ascii of s
+cmp bl,[si]
+jz check_si_2
+jnz error_register_name_dec
+
+check_si_2:
+mov bl,69h ;ascii of  i
+cmp bl,[si]
+jz dec_si
+jnz check_sp_2
+
+dec_si:
+mov ax ,real_reg_si_2
+dec ax
+mov real_reg_si_2,ax
+jmp continue
+
+check_sp_2:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz dec_sp
+jnz error_register_name_dec
+
+dec_sp:
+mov ax ,real_reg_sp_2
+dec ax
+mov real_reg_sp_2,ax
+jmp continue
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;command_Dec;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;command_SUB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+sub_logic:
+getregistername_sub_op1:
+
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+
+mov ah,9
+ mov dx,offset Mess_operand_1
+ int 21h 
+ 
+ 
+ ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset operand_1
+        int 21h
+        
+        
+;check if register is ax or al or ah         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,61h  ;ascii of a 
+cmp bl,[si]
+jz AX_check_3
+jnz another_register_name_check_1_3
+
+
+Ax_check_3:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz ax_sub_?
+jnz another_compare_of_ax_1_3
+ 
+
+another_compare_of_ax_1_3:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz ah_sub_?
+jnz another_compare_of_ax_2_3
+
+
+another_compare_of_ax_2_3:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz al_sub_?
+jnz error_Register_name_sub_op1
+
+
+another_register_name_check_1_3:
+;check if register is bx or bl or bh         
+mov cl,2h
+mov si,offset [operand_1+2]
+mov bl,62h  ;ascii of b 
+cmp bl,[si]
+jz bX_check_3
+;jnz another_register_name_check_2_3
+
+
+bx_check_3:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz bx_sub_?
+jnz another_compare_of_bx_1_3
+ 
+
+another_compare_of_bx_1_3:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz bh_sub_?
+;jnz another_compare_of_bx_2_3
+
+
+
+;another_compare_of_bx_2_3:
+;mov bl,6ch ; ascii of l
+;cmp bl ,[si]
+;jz dec_bl
+;jnz compare_BP_3
+
+;dec_bl:
+;mov al,byte ptr real_reg_bx_2
+;dec al
+;mov byte ptr real_reg_bx_2,al
+
+; to check if register is BP or not
+;compare_BP_3:
+;mov bl,70h ;ascii of p
+;cmp bl,[si]
+;jz dec_BP
+;jnz error_register_name_sub_op1
+
+;dec_BP:
+;mov ax,real_reg_bp_2
+;dec ax
+;mov real_reg_bp_2,ax
+;jmp continue  
+ 
+;another_register_name_check_2_3: 
+;check if register is cx or cl or ch         
+;mov cl,2h
+;mov si,offset [operand_1+2]
+;mov bl,63h  ;ascii of c 
+;cmp bl,[si]
+;jz cX_check_3
+;jnz another_register_name_check_3_3
+
+
+;cx_check_3:
+;mov bl,78h  ;ascii of x
+;inc si
+;cmp bl,[si]
+;jz dec_cx
+;jnz another_compare_of_cx_1_3
+
+;dec_cx:
+;mov ax,real_reg_cx_2
+;dec ax
+;mov real_reg_cx_2,ax 
+;jmp continue 
+
+;another_compare_of_cx_1_3:
+;mov bl,68h ;ascii of h
+;cmp bl,[si]
+;jz dec_ch
+;jnz another_compare_of_cx_2_3
+
+;dec_ch:
+;mov ax,real_reg_cx_2+1
+;dec ax
+;mov real_reg_cx_2+1,ax
+ 
+;jmp continue
+
+;another_compare_of_cx_2_3:
+;mov bl,6ch ; ascii of l
+;cmp bl ,[si]
+;jz dec_cl
+;jnz error_Register_name_sub_op1
+
+;dec_cl:
+;mov al,byte ptr real_reg_cx_2
+;dec al
+;mov byte ptr real_reg_cx_2,al
+
+;jmp continue
+
+
+;another_register_name_check_3_3:
+;check if register is dx or dl or dh         
+;mov cl,2h
+;mov si,offset [operand_1+2]
+;mov bl,64h  ;ascii of d 
+;cmp bl,[si]
+;jz dX_check_3
+;jnz another_register_name_check_4_3
+
+
+;dx_check_3:
+;mov bl,78h  ;ascii of x
+;inc si
+;cmp bl,[si]
+;jz dec_dx
+;jnz another_compare_of_dx_1_3
+
+;dec_dx:
+;mov ax, real_reg_dx_2
+;dec ax
+;mov  real_reg_dx_2,ax 
+;jmp continue 
+
+;another_compare_of_dx_1_3:
+;mov bl,68h ;ascii of h
+;cmp bl,[si]
+;jz dec_dh
+;jnz another_compare_of_dx_2_3
+
+;dec_dh:
+;mov ax,real_reg_dx_2+1
+;dec ax
+;mov real_reg_dx_2+1,ax
+ 
+;jmp continue
+
+;another_compare_of_dx_2_3:
+;mov bl,6ch ; ascii of l
+;cmp bl ,[si]
+;jz dec_dl
+;jnz Compare_DI_2
+
+;dec_dl:
+;mov al,byte ptr real_reg_dx_2
+;dec al
+;mov byte ptr real_reg_dx_2,al
+;jmp continue
+
+; to check if register is DI or not
+;compare_DI_2:
+;mov bl,69h ;ascii of p
+;cmp bl,[si]
+;jz dec_DI
+;jnz error_register_name_sub_op1
+
+;dec_DI:
+;mov ax ,real_reg_di_2
+;dec ax
+;mov real_reg_di_2,ax
+;jmp continue 
+
+;another_register_name_check_4_3:
+;mov bl,73h ; ascii of s
+;cmp bl,[si]
+;jz check_si_3
+;jnz error_register_name_sub_op1
+
+;check_si_3:
+;mov bl,69h ;ascii of  i
+;cmp bl,[si]
+;jz dec_si
+;jnz check_sp_3
+
+;dec_si:
+;mov ax ,real_reg_si_2
+;dec ax
+;mov real_reg_si_2,ax
+;jmp continue
+
+;check_sp_3:
+;mov bl,70h ;ascii of p
+;cmp bl,[si]
+;jz dec_sp
+;jnz error_register_name_sub_op1
+
+;dec_sp:
+;mov ax ,real_reg_sp_2
+;dec ax
+;mov real_reg_sp_2,ax
+;jmp continue
+        
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+            
+ax_sub_?:
+
+mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ 
+ mov ah,9
+ mov dx,offset value_OR_register
+ int 21h
+ 
+ ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset vORr
+        int 21h 
+        mov ah,vORr+2
+        mov al,72h  ;ascii of r
+        mov bl,76h  ;ascii of v
+        cmp ah,al
+        jz getRegisterName_sub_op2
+        cmp ah,bl 
+        jz getValue_ax_sub_op2
+        
+
+
+getValue_ax_sub_op2:
+mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+mov ah,9
+mov dx,offset Mess_value
+int 21h
+
+mov ah,0AH 
+mov dx,offset value
+int 21h 
+
+mov al, value + 2
+mov bh, 30h
+cmp al, bh
+jnz  check_if_1_A
+jz   isdigit_A
+
+check_if_1_A :
+mov bh, 31h
+cmp al, bh
+jnz  check_if_2_A
+jz   isdigit_A
+
+check_if_2_A :
+mov bh, 32h
+cmp al, bh
+jnz  check_if_3_A
+jz   isdigit_A
+
+check_if_3_A :
+mov bh, 33h
+cmp al, bh
+jnz  check_if_4_A
+jz   isdigit_A
+
+check_if_4_A :
+mov bh, 34h
+cmp al, bh
+jnz  check_if_5_A
+jz   isdigit_A
+
+
+check_if_5_A :
+mov bh, 35h
+cmp al, bh
+jnz  check_if_6_A
+jz   isdigit_A
+
+
+check_if_6_A :
+mov bh, 36h
+cmp al, bh
+jnz  check_if_7_A
+jz   isdigit_A
+
+
+check_if_7_A :
+mov bh, 37h
+cmp al, bh
+jnz  check_if_8_A
+jz   isdigit_A
+
+
+check_if_8_A :
+mov bh, 38h
+cmp al, bh
+jnz  check_if_9_A
+jz   isdigit_A
+
+
+check_if_9_A :
+mov bh, 39h
+cmp al, bh
+jnz  isletter_A
+jz   isdigit_A
+
+
+
+
+isdigit_A:
+sub al, 30h
+mov bl, 10h
+mul bl
+mov ch, al
+
+jmp  check_2nd_char_A
+
+isletter_A :
+sub al, 60h
+add al, 9h
+mov bl, 10h
+mul bl
+mov ch, al
+
+jmp  check_2nd_char_A
+
+
+check_2nd_char_A :
+mov al, value + 3
+mov bh, 30h
+cmp al, bh
+jnz  check_if_1_A_1
+jz   isdigit_A_1
+
+
+check_if_1_A_1 :
+mov bh, 31h
+cmp al, bh
+jnz  check_if_2_A_1
+jz   isdigit_A_1
+
+
+check_if_2_A_1 :
+mov bh, 32h
+cmp al, bh
+jnz  check_if_3_A_1
+jz   isdigit_A_1
+
+
+check_if_3_A_1 :
+mov bh, 33h
+cmp al, bh
+jnz  check_if_4_A_1
+jz   isdigit_A_1
+
+
+check_if_4_A_1 :
+mov bh, 34h
+cmp al, bh
+jnz  check_if_5_A_1
+jz   isdigit_A_1
+
+
+check_if_5_A_1 :
+mov bh, 35h
+cmp al, bh
+jnz  check_if_6_A_1
+jz   isdigit_A_1
+
+
+check_if_6_A_1 :
+mov bh, 36h
+cmp al, bh
+jnz  check_if_7_A_1
+jz   isdigit_A_1
+
+
+check_if_7_A_1 :
+mov bh, 37h
+cmp al, bh
+jnz  check_if_8_A_1
+jz   isdigit_A_1
+
+
+check_if_8_A_1 :
+mov bh, 38h
+cmp al, bh
+jnz  check_if_9_A_1
+jz   isdigit_A_1
+
+
+check_if_9_A_1 :
+mov bh, 39h
+cmp al, bh
+jnz  isletter_A_1
+jz   isdigit_A_1
+
+
+
+isdigit_A_1:; reg_Ax_1 + 3 is unit
+sub al, 30h
+add ch, al
+
+
+jmp  check_3rd_char_A
+
+
+isletter_A_1 :
+sub al, 60h
+add al, 9h
+add ch, al
+
+jmp  check_3rd_char_A
+check_3rd_char_A :
+mov al, value + 4
+mov bh, 30h
+cmp al, bh
+jnz  check_if_1_A_2
+jz   isdigit_A_2
+
+check_if_1_A_2 :
+mov bh, 31h
+cmp al, bh
+jnz  check_if_2_A_2
+jz   isdigit_A_2
+
+check_if_2_A_2 :
+mov bh, 32h
+cmp al, bh
+jnz  check_if_3_A_2
+jz   isdigit_A_2
+
+check_if_3_A_2 :
+mov bh, 33h
+cmp al, bh
+jnz  check_if_4_A_2
+jz   isdigit_A_2
+
+check_if_4_A_2 :
+mov bh, 34h
+cmp al, bh
+jnz  check_if_5_A_2
+jz   isdigit_A_2
+
+
+check_if_5_A_2 :
+mov bh, 35h
+cmp al, bh
+jnz  check_if_6_A_2
+jz   isdigit_A_2
+
+check_if_6_A_2 :
+mov bh, 36h
+cmp al, bh
+jnz  check_if_7_A_2
+jz   isdigit_A_2
+
+
+check_if_7_A_2 :
+mov bh, 37h
+cmp al, bh
+jnz  check_if_8_A_2
+jz   isdigit_A_2
+
+
+check_if_8_A_2 :
+mov bh, 38h
+cmp al, bh
+jnz  check_if_9_A_2
+jz   isdigit_A_2
+
+
+check_if_9_A_2 :
+mov bh, 39h
+cmp al, bh
+jnz  isletter_A_2
+jz   isdigit_A_2
+
+
+
+isdigit_A_2:; reg_Ax_1 + 4 is tens
+sub al, 30h
+mov bl, 10h
+mul bl
+mov cl, al
+
+
+jmp  check_4th_char_A
+
+
+isletter_A_2 :
+sub al, 60h
+add al, 9h
+mov bl, 10h
+mul bl
+mov cl, al
+
+
+check_4th_char_A :
+
+mov al, value + 5
+mov bh, 30h
+cmp al, bh
+jnz  check_if_1_A_3
+jz   isdigit_A_3
+
+
+check_if_1_A_3 :
+mov bh, 31h
+cmp al, bh
+jnz  check_if_2_A_3
+jz   isdigit_A_3
+
+
+check_if_2_A_3 :
+mov bh, 32h
+cmp al, bh
+jnz  check_if_3_A_3
+jz   isdigit_A_3
+
+
+check_if_3_A_3 :
+mov bh, 33h
+cmp al, bh
+jnz  check_if_4_A_3
+jz   isdigit_A_3
+
+
+check_if_4_A_3 :
+mov bh, 34h
+cmp al, bh
+jnz  check_if_5_A_3
+jz   isdigit_A_3
+
+
+check_if_5_A_3 :
+mov bh, 35h
+cmp al, bh
+jnz  check_if_6_A_3
+jz   isdigit_A_3
+
+
+check_if_6_A_3 :
+mov bh, 36h
+cmp al, bh
+jnz  check_if_7_A_3
+jz   isdigit_A_3
+
+check_if_7_A_3 :
+mov bh, 37h
+cmp al, bh
+jnz  check_if_8_A_3
+jz   isdigit_A_3
+
+
+check_if_8_A_3 :
+mov bh, 38h
+cmp al, bh
+jnz  check_if_9_A_3
+jz   isdigit_A_3
+
+check_if_9_A_3 :
+mov bh, 39h
+cmp al, bh
+jnz  isletter_A_3
+jz   isdigit_A_3
+
+
+
+isdigit_A_3:; reg_Ax_1 + 5 is unit
+sub al, 30h
+add cl, al
+
+
+jmp  finish_check_digits_and_letters_of_input_A
+
+isletter_A_3 :
+sub al, 60h
+add al, 9h
+add cl, al
+
+
+finish_check_digits_and_letters_of_input_A :
+
+mov ax, cx
+ 
+       
+  mov bx,real_reg_Ax_2
+  sub bx,ax
+  mov real_reg_Ax_2,bx     
+  jmp continue 
+ 
+
+getRegisterName_sub_op2:
+
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+
+
+ mov ah,9
+        mov dx,offset Mess_operand_2
+        int 21h
+
+        ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset operand_2
+        int 21h 
+
+
+
+;check if register is ax or al or ah         
+mov si,offset [operand_2+2]
+mov bl,61h  ;ascii of a 
+cmp bl,[si]
+jz AX_check_4
+jnz another_register_name_check_1_4
+
+
+Ax_check_4:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz ax_sub_ax
+jnz error_Register_name_sub_op2
+
+ax_sub_ax:
+mov ax, real_reg_Ax_2
+mov bx,real_reg_Ax_2
+sub ax,bx
+mov real_reg_Ax_2,ax 
+jmp continue 
+
+
+
+
+another_register_name_check_1_4:
+;check if register is bx          
+mov si,offset [operand_2+2]
+mov bl,62h  ;ascii of b 
+cmp bl,[si]
+jz bx_check_4
+jnz another_register_name_check_2_4
+
+bx_check_4:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz ax_sub_bx
+jnz another_compare_of_bx_1_4
+
+
+ax_sub_bx:
+mov ax,real_reg_ax_2
+mov bx,real_reg_bx_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue
+
+another_compare_of_bx_1_4:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz sizemismatch
+jnz another_compare_of_bx_2_4
+
+another_compare_of_bx_2_4:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz sizemismatch
+jnz compare_BP_4
+
+ 
+
+
+; to check if register is BP or not
+compare_BP_4:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz ax_sub_BP
+jnz error_register_name_sub_op2
+
+ax_sub_BP:
+mov ax,real_reg_ax_2
+mov bx,real_reg_BP_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue  
+ 
+another_register_name_check_2_4: 
+;check if register is cx         
+mov si,offset [operand_2+2]
+mov bl,63h  ;ascii of c 
+cmp bl,[si]
+jz cX_check_4
+jnz another_register_name_check_3_4
+
+
+cx_check_4:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz ax_sub_cx
+jnz error_register_name_sub_op2
+
+ax_sub_cx:
+mov ax,real_reg_ax_2
+mov bx,real_reg_cx_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue 
+
+another_compare_of_cx_1_4:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz sizemismatch
+jnz another_compare_of_cx_2_4
+ 
+jmp continue
+
+another_compare_of_cx_2_4:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz sizemismatch
+jnz error_Register_name_sub_op2
+
+
+another_register_name_check_3_4:
+;check if register is dx or dl or dh         
+mov si,offset [operand_2+2]
+mov bl,64h  ;ascii of d 
+cmp bl,[si]
+jz dX_check_4
+jnz another_register_name_check_4_4
+
+
+dx_check_4:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz ax_sub_dx
+jnz another_compare_of_dx_1_4
+
+ax_sub_dx:
+mov ax,real_reg_ax_2
+mov bx,real_reg_dx_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue 
+
+another_compare_of_dx_1_4:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz sizemismatch
+jnz another_compare_of_dx_2_4
+
+another_compare_of_dx_2_4:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz sizemismatch
+jnz Compare_DI_4
+
+; to check if register is DI or not
+compare_DI_4:
+mov bl,69h ;ascii of i
+cmp bl,[si]
+jz ax_sub_DI
+jnz error_register_name_sub_op2
+
+ax_sub_DI:
+mov ax,real_reg_ax_2
+mov bx,real_reg_di_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue  
+
+another_register_name_check_4_4:
+mov bl,73h ; ascii of s
+cmp bl,[si]
+jz check_si_4
+jnz error_register_name_sub_op2
+
+check_si_4:
+mov bl,69h ;ascii of  i
+cmp bl,[si]
+jz ax_sub_si
+jnz check_sp_4
+
+ax_sub_si:
+mov ax,real_reg_ax_2
+mov bx,real_reg_si_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue 
+
+check_sp_4:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz ax_sub_sp
+jnz error_register_name_sub_op2
+
+ax_sub_sp:
+mov ax,real_reg_ax_2
+mov bx,real_reg_sp_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;ah_sub_?;;;;;;;;;;;;;;;;;;;;
+ah_sub_?: 
+
+mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ 
+ mov ah,9
+ mov dx,offset value_OR_register
+ int 21h
+ 
+ ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset vORr
+        int 21h                                                                      
+        
+        mov ah,vORr+2
+        mov al,72h  ;ascii of r
+        mov bl,76h  ;ascii of v
+        cmp ah,al
+        jz getRegisterName_ah_sub_op2
+        cmp ah,bl 
+        jz getValue_ah_sub_op2
+        
+         
+        
+        
+getValue_ah_sub_op2:
+mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+mov ah,9
+mov dx,offset Mess_value
+int 21h
+
+mov ah,0AH 
+mov dx,offset value2        
+int 21h 
+
+    ;check_digits_or_letters value
+     
+    mov al,value2+2
+          mov bh,30h
+       cmp al,bh
+       jnz  check_if_1A
+       jz   isdigitA
+       
+       check_if_1A:
+       mov bh,31h
+       cmp al,bh
+       jnz  check_if_2A
+       jz   isdigitA
+       
+        check_if_2A:
+       mov bh,32h
+       cmp al,bh
+       jnz  check_if_3A
+       jz   isdigitA 
+       
+        check_if_3A:
+       mov bh,33h
+       cmp al,bh
+       jnz  check_if_4A
+       jz   isdigitA
+       
+         check_if_4A:
+       mov bh,34h
+       cmp al,bh
+       jnz  check_if_5A
+       jz   isdigitA 
+        
+       
+        check_if_5A:
+       mov bh,35h
+       cmp al,bh
+       jnz  check_if_6A
+       jz   isdigitA
+       
+	   
+        check_if_6A:
+       mov bh,36h
+       cmp al,bh
+       jnz  check_if_7A
+       jz   isdigitA 
+        
+	
+       check_if_7A:
+       mov bh,37h
+       cmp al,bh
+       jnz  check_if_8A
+       jz   isdigitA 
+        
+	
+      check_if_8A:
+       mov bh,38h
+       cmp al,bh
+       jnz  check_if_9A
+       jz   isdigitA
+       
+	   
+        check_if_9A:
+       mov bh,39h
+       cmp al,bh
+       jnz  isletterA
+       jz   isdigitA
+       
+
+       
+       
+        isdigitA:
+       sub al,30h
+       mov bl,10h
+       mul bl
+       mov ch,al
+       
+       jmp  check_2nd_charA
+       
+        isletterA:
+       sub al,60h
+       add al,9h
+       mov bl,10h
+       mul bl
+       mov ch,al
+       
+       jmp  check_2nd_charA 
+       
+       
+        check_2nd_charA:
+       mov al,value2+3
+       mov bh,30h
+       cmp al,bh
+       jnz  check_if_1A1_
+       jz   isdigitA1_
+       
+	   
+        check_if_1A1_:
+       mov bh,31h
+       cmp al,bh
+       jnz  check_if_2A1_
+       jz   isdigitA1_
+       
+	   
+        check_if_2A1_:
+       mov bh,32h
+       cmp al,bh
+       jnz  check_if_3A1_
+       jz   isdigitA1_ 
+       
+	   
+        check_if_3A1_:
+       mov bh,33h
+       cmp al,bh
+       jnz  check_if_4A1_
+       jz   isdigitA1_
+        
+	
+        check_if_4A1_:
+       mov bh,34h
+       cmp al,bh
+       jnz  check_if_5A1_
+       jz   isdigitA1_ 
+        
+        
+       check_if_5A1_:
+       mov bh,35h
+       cmp al,bh
+       jnz  check_if_6A1_
+       jz   isdigitA1_
+       
+	   
+       check_if_6A1_:
+       mov bh,36h
+       cmp al,bh
+       jnz  check_if_7A1_
+       jz   isdigitA1_ 
+        
+		
+       check_if_7A1_:
+       mov bh,37h
+       cmp al,bh
+       jnz  check_if_8A1_
+       jz   isdigitA1_ 
+        
+		
+       check_if_8A1_:
+       mov bh,38h
+       cmp al,bh
+       jnz  check_if_9A1_
+       jz   isdigitA1_
+       
+	   
+       check_if_9A1_:
+       mov bh,39h
+       cmp al,bh
+       jnz  isletterA1_
+       jz   isdigitA1_
+       
+       
+       
+        isdigitA1_: ;reg_Ax_1+3 is unit 
+       sub al,30h
+       add ch,al
+       
+       
+       jmp  finish_check_digits_and_letters_of_inputA
+       
+	   
+       isletterA1_:
+       sub al,60h
+       add al,9h
+       add ch,al
+       
+       jmp  finish_check_digits_and_letters_of_inputA
+        
+       
+       finish_check_digits_and_letters_of_inputA:
+       
+       mov ax,cx
+     
+       mov bh,ah
+       mov bl,byte ptr real_reg_Ax_2+1
+       sub bl,bh
+       mov byte ptr real_reg_Ax_2+1,bl 
+       
+       jmp continue   
+      
+
+
+
+
+getRegisterName_ah_sub_op2:
+
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+
+
+ mov ah,9
+        mov dx,offset Mess_operand_2
+        int 21h
+
+        ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset operand_2
+        int 21h 
+
+
+
+;check if register is ax or al or ah         
+mov si,offset [operand_2+2]
+mov bl,61h  ;ascii of a 
+cmp bl,[si]
+jz AX_check_5
+jnz another_register_name_check_1_5
+
+
+Ax_check_5:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch2
+jnz another_compare_ax_1_5
+
+another_compare_ax_1_5:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz ah_sub_ah
+jnz another_compare_of_ax_2_5
+
+
+ah_sub_ah:
+mov ah,byte ptr real_reg_Ax_2+1
+mov bh,byte ptr real_reg_Ax_2+1
+sub ah,bh
+mov byte ptr real_reg_Ax_2+1,ah 
+jmp continue
+
+another_compare_of_ax_2_5:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz ah_sub_al
+jnz error_Register_name_ah_sub 
+
+ah_sub_al:
+mov ah, byte ptr real_reg_Ax_2+1
+mov bh,byte ptr real_reg_Ax_2
+sub ah,bh
+mov byte ptr real_reg_Ax_2+1,ah 
+jmp continue
+
+
+another_register_name_check_1_5:
+;check if register is bx          
+mov si,offset [operand_2+2]
+mov bl,62h  ;ascii of b 
+cmp bl,[si]
+jz bx_check_5
+jnz another_register_name_check_2_5
+
+bx_check_5:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch2
+jnz another_compare_of_bx_1_5
+
+
+another_compare_of_bx_1_5:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz ah_sub_bh
+jnz another_compare_of_bx_2_5
+
+ah_sub_bh:
+mov ah,byte ptr real_reg_Ax_2+1
+mov bh,byte ptr real_reg_bx_2+1
+sub ah,bh
+mov byte ptr real_reg_Ax_2+1,ah 
+jmp continue
+
+
+another_compare_of_bx_2_5:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz ah_sub_bl
+jnz compare_BP_5 
+
+
+ah_sub_bl:
+mov ah,byte ptr real_reg_Ax_2+1
+mov bh,byte ptr real_reg_bx_2
+sub ah,bh
+mov byte ptr real_reg_Ax_2+1,ah 
+jmp continue
+
+; to check if register is BP or not
+compare_BP_5:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz sizemismatch2
+jnz error_register_name_ah_sub
+  
+ 
+another_register_name_check_2_5: 
+;check if register is cx         
+mov si,offset [operand_2+2]
+mov bl,63h  ;ascii of c 
+cmp bl,[si]
+jz cX_check_5
+jnz another_register_name_check_3_5
+
+
+cx_check_5:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch2
+jnz another_compare_of_cx_1_5
+ 
+
+another_compare_of_cx_1_5:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz ah_sub_ch
+jnz another_compare_of_cx_2_5
+
+ah_sub_ch:
+mov ah,byte ptr real_reg_Ax_2+1
+mov bh,byte ptr real_reg_cx_2+1
+sub ah,bh
+mov byte ptr real_reg_Ax_2+1,ah 
+jmp continue
+ 
+
+another_compare_of_cx_2_5:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz ah_sub_cl
+jnz error_Register_name_ah_sub
+
+ah_sub_cl:
+mov ah,byte ptr real_reg_Ax_2+1
+mov bh,byte ptr real_reg_cx_2
+sub ah,bh
+mov byte ptr real_reg_Ax_2+1,ah 
+jmp continue
+
+
+another_register_name_check_3_5:
+;check if register is dx or dl or dh         
+mov si,offset [operand_2+2]
+mov bl,64h  ;ascii of d 
+cmp bl,[si]
+jz dX_check_5
+jnz another_register_name_check_4_5
+
+
+dx_check_5:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch2
+jnz another_compare_of_dx_1_5
+ 
+
+another_compare_of_dx_1_5:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz ah_sub_dh
+jnz another_compare_of_dx_2_5
+
+ah_sub_dh:
+mov ah,byte ptr real_reg_Ax_2+1
+mov bh,byte ptr real_reg_dx_2+1
+sub ah,bh
+mov byte ptr real_reg_Ax_2+1,ah 
+jmp continue
+
+another_compare_of_dx_2_5:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz ah_sub_dl
+jnz Compare_DI_5
+
+ah_sub_dl:
+mov ah,byte ptr real_reg_Ax_2+1
+mov bh,byte ptr real_reg_dx_2
+sub ah,bh
+mov byte ptr real_reg_Ax_2+1,ah 
+jmp continue
+
+; to check if register is DI or not
+compare_DI_5:
+mov bl,69h ;ascii of i
+cmp bl,[si]
+jz sizemismatch2
+jnz error_register_name_ah_sub
+  
+
+another_register_name_check_4_5:
+mov bl,73h ; ascii of s
+cmp bl,[si]
+jz check_si_5
+jnz error_register_name_ah_sub
+
+check_si_5:
+mov bl,69h ;ascii of  i
+inc si
+cmp bl,[si]
+jz sizemismatch2
+jnz check_sp_5 
+
+check_sp_5:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz sizemismatch2
+jnz error_register_name_ah_sub 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;ah_sub_?;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;endofcode
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;al_sub_?;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;startofcode
+al_sub_?:
+mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ 
+ mov ah,9
+ mov dx,offset value_OR_register
+ int 21h
+ 
+ ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset vORr
+        int 21h                                                                      
+        
+        mov ah,vORr+2
+        mov al,72h  ;ascii of r
+        mov bl,76h  ;ascii of v
+        cmp ah,al
+        jz getRegisterName_al_sub_op2
+        cmp ah,bl 
+        jz getValue_al_sub_op2
+        
+         
+        
+        
+getValue_al_sub_op2:
+mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+mov ah,9
+mov dx,offset Mess_value
+int 21h
+
+mov ah,0AH 
+mov dx,offset value2        
+int 21h 
+
+mov al,value2+2
+          mov bh,30h
+       cmp al,bh
+       jnz  check_if_1B
+       jz   isdigitB
+       
+       check_if_1B:
+       mov bh,31h
+       cmp al,bh
+       jnz  check_if_2B
+       jz   isdigitB
+       
+        check_if_2B:
+       mov bh,32h
+       cmp al,bh
+       jnz  check_if_3B
+       jz   isdigitB 
+       
+        check_if_3B:
+       mov bh,33h
+       cmp al,bh
+       jnz  check_if_4B
+       jz   isdigitB
+       
+         check_if_4B:
+       mov bh,34h
+       cmp al,bh
+       jnz  check_if_5B
+       jz   isdigitB 
+        
+       
+        check_if_5B:
+       mov bh,35h
+       cmp al,bh
+       jnz  check_if_6B
+       jz   isdigitB
+       
+	   
+        check_if_6B:
+       mov bh,36h
+       cmp al,bh
+       jnz  check_if_7B
+       jz   isdigitB 
+        
+	
+       check_if_7B:
+       mov bh,37h
+       cmp al,bh
+       jnz  check_if_8B
+       jz   isdigitB 
+        
+	
+      check_if_8B:
+       mov bh,38h
+       cmp al,bh
+       jnz  check_if_9B
+       jz   isdigitB
+       
+	   
+        check_if_9B:
+       mov bh,39h
+       cmp al,bh
+       jnz  isletterB
+       jz   isdigitB
+       
+
+       
+       
+        isdigitB:
+       sub al,30h
+       mov bl,10h
+       mul bl
+       mov ch,al
+       
+       jmp  check_2nd_charA
+       
+        isletterB:
+       sub al,60h
+       add al,9h
+       mov bl,10h
+       mul bl
+       mov ch,al
+       
+       jmp  check_2nd_charA 
+       
+       
+        check_2nd_charB:
+       mov al,value2+3
+       mov bh,30h
+       cmp al,bh
+       jnz  check_if_1B1_
+       jz   isdigitB1_
+       
+	   
+        check_if_1B1_:
+       mov bh,31h
+       cmp al,bh
+       jnz  check_if_2B1_
+       jz   isdigitB1_
+       
+	   
+        check_if_2B1_:
+       mov bh,32h
+       cmp al,bh
+       jnz  check_if_3B1_
+       jz   isdigitB1_ 
+       
+	   
+        check_if_3B1_:
+       mov bh,33h
+       cmp al,bh
+       jnz  check_if_4B1_
+       jz   isdigitB1_
+        
+	
+        check_if_4B1_:
+       mov bh,34h
+       cmp al,bh
+       jnz  check_if_5B1_
+       jz   isdigitB1_ 
+        
+        
+       check_if_5B1_:
+       mov bh,35h
+       cmp al,bh
+       jnz  check_if_6B1_
+       jz   isdigitB1_
+       
+	   
+       check_if_6B1_:
+       mov bh,36h
+       cmp al,bh
+       jnz  check_if_7B1_
+       jz   isdigitB1_ 
+        
+		
+       check_if_7B1_:
+       mov bh,37h
+       cmp al,bh
+       jnz  check_if_8B1_
+       jz   isdigitB1_ 
+        
+		
+       check_if_8B1_:
+       mov bh,38h
+       cmp al,bh
+       jnz  check_if_9B1_
+       jz   isdigitB1_
+       
+	   
+       check_if_9B1_:
+       mov bh,39h
+       cmp al,bh
+       jnz  isletterB1_
+       jz   isdigitB1_
+       
+       
+       
+        isdigitB1_: ;reg_Ax_1+3 is unit 
+       sub al,30h
+       add ch,al
+       
+       
+       jmp  finish_check_digits_and_letters_of_inputB
+       
+	   
+       isletterB1_:
+       sub al,60h
+       add al,9h
+       add ch,al
+       
+       jmp  finish_check_digits_and_letters_of_inputB
+        
+       
+       finish_check_digits_and_letters_of_inputB:
+       
+       mov ax,cx
+
+       mov bl ,ah 
+       mov bh , byte ptr real_reg_Ax_2
+       sub bh,bl
+       mov byte ptr real_reg_Ax_2,bh
+
+
+getRegisterName_al_sub_op2:
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+
+
+ mov ah,9
+        mov dx,offset Mess_operand_2
+        int 21h
+
+        ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset operand_2
+        int 21h 
+
+
+
+;check if register is ax or al or ah         
+mov si,offset [operand_2+2]
+mov bl,61h  ;ascii of a 
+cmp bl,[si]
+jz AX_check_6
+jnz another_register_name_check_1_6
+
+
+Ax_check_6:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch3
+jnz another_compare_ax_1_6
+
+another_compare_ax_1_6:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz al_sub_ah
+jnz another_compare_of_ax_2_6
+
+
+al_sub_ah:
+mov ah,byte ptr real_reg_Ax_2
+mov bh,byte ptr real_reg_Ax_2+1
+sub ah,bh
+mov byte ptr real_reg_Ax_2,ah 
+jmp continue
+
+another_compare_of_ax_2_6:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz al_sub_al
+jnz error_Register_name_al_sub 
+
+al_sub_al:
+mov ah, byte ptr real_reg_Ax_2
+mov bh,byte ptr real_reg_Ax_2
+sub ah,bh
+mov byte ptr real_reg_Ax_2,ah 
+jmp continue
+
+
+another_register_name_check_1_6:
+;check if register is bx          
+mov si,offset [operand_2+2]
+mov bl,62h  ;ascii of b 
+cmp bl,[si]
+jz bx_check_6
+jnz another_register_name_check_2_6
+
+bx_check_6:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch3
+jnz another_compare_of_bx_1_6
+
+
+another_compare_of_bx_1_6:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz al_sub_bh
+jnz another_compare_of_bx_2_6
+
+al_sub_bh:
+mov ah,byte ptr real_reg_Ax_2
+mov bh,byte ptr real_reg_bx_2+1
+sub ah,bh
+mov byte ptr real_reg_Ax_2,ah 
+jmp continue
+
+
+another_compare_of_bx_2_6:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz al_sub_bl
+jnz compare_BP_6 
+
+
+al_sub_bl:
+mov ah,byte ptr real_reg_Ax_2
+mov bh,byte ptr real_reg_bx_2
+sub ah,bh
+mov byte ptr real_reg_Ax_2,ah 
+jmp continue
+
+; to check if register is BP or not
+compare_BP_6:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz sizemismatch3
+jnz error_register_name_al_sub
+  
+ 
+another_register_name_check_2_6: 
+;check if register is cx         
+mov si,offset [operand_2+2]
+mov bl,63h  ;ascii of c 
+cmp bl,[si]
+jz cX_check_6  
+jnz another_register_name_check_3_6
+
+
+cx_check_6:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch3
+jnz another_compare_of_cx_1_6
+ 
+
+another_compare_of_cx_1_6:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz al_sub_ch
+jnz another_compare_of_cx_2_6
+
+al_sub_ch:
+mov ah,byte ptr real_reg_Ax_2
+mov bh,byte ptr real_reg_cx_2+1
+sub ah,bh
+mov byte ptr real_reg_Ax_2,ah 
+jmp continue
+ 
+
+another_compare_of_cx_2_6:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz al_sub_cl
+jnz error_Register_name_al_sub
+
+al_sub_cl:
+mov ah,byte ptr real_reg_Ax_2
+mov bh,byte ptr real_reg_cx_2
+sub ah,bh
+mov byte ptr real_reg_Ax_2,ah 
+jmp continue
+
+
+another_register_name_check_3_6:
+;check if register is dx or dl or dh         
+mov si,offset [operand_2+2]
+mov bl,64h  ;ascii of d 
+cmp bl,[si]
+jz dX_check_6
+jnz another_register_name_check_4_6
+
+
+dx_check_6:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch3
+jnz another_compare_of_dx_1_6
+ 
+
+another_compare_of_dx_1_6:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz al_sub_dh
+jnz another_compare_of_dx_2_6
+
+al_sub_dh:
+mov ah,byte ptr real_reg_Ax_2
+mov bh,byte ptr real_reg_dx_2+1
+sub ah,bh
+mov byte ptr real_reg_Ax_2,ah 
+jmp continue
+
+another_compare_of_dx_2_6:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz al_sub_dl
+jnz Compare_DI_6
+
+al_sub_dl:
+mov ah,byte ptr real_reg_Ax_2
+mov bh,byte ptr real_reg_dx_2
+sub ah,bh
+mov byte ptr real_reg_Ax_2,ah 
+jmp continue
+
+; to check if register is DI or not
+compare_DI_6:
+mov bl,69h ;ascii of i
+cmp bl,[si]
+jz sizemismatch3
+jnz error_register_name_al_sub
+  
+
+another_register_name_check_4_6:
+mov bl,73h ; ascii of s
+cmp bl,[si]
+jz check_si_6
+jnz error_register_name_al_sub
+
+check_si_6:
+mov bl,69h ;ascii of  i
+cmp bl,[si]
+jz sizemismatch3
+jnz check_sp_6 
+
+check_sp_6:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz sizemismatch3
+jnz error_register_name_al_sub
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;al_sub_?;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;endofcode
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;bx_sub_?;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;startofcode
+bx_sub_?:
+mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ 
+ mov ah,9
+ mov dx,offset value_OR_register
+ int 21h
+ 
+ ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset vORr
+        int 21h 
+        mov ah,vORr+2
+        mov al,72h  ;ascii of r
+        mov bl,76h  ;ascii of v
+        cmp ah,al
+        jz getRegisterName_bx_sub_op2
+        cmp ah,bl 
+        jz getValue_bx_sub_op2
+        
+
+
+getValue_bx_sub_op2:
+mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+mov ah,9
+mov dx,offset Mess_value
+int 21h
+
+mov ah,0AH 
+mov dx,offset value
+int 21h 
+
+ mov al, value + 2
+mov bh, 30h
+cmp al, bh
+jnz  check_if_1_B
+jz   isdigit_B
+
+check_if_1_B :
+mov bh, 31h
+cmp al, bh
+jnz  check_if_2_B
+jz   isdigit_B
+
+check_if_2_B :
+mov bh, 32h
+cmp al, bh
+jnz  check_if_3_B
+jz   isdigit_B
+
+check_if_3_B :
+mov bh, 33h
+cmp al, bh
+jnz  check_if_4_B
+jz   isdigit_B
+
+check_if_4_B :
+mov bh, 34h
+cmp al, bh
+jnz  check_if_5_B
+jz   isdigit_B
+
+
+check_if_5_B :
+mov bh, 35h
+cmp al, bh
+jnz  check_if_6_B
+jz   isdigit_B
+
+
+check_if_6_B :
+mov bh, 36h
+cmp al, bh
+jnz  check_if_7_B
+jz   isdigit_B
+
+
+check_if_7_B :
+mov bh, 37h
+cmp al, bh
+jnz  check_if_8_B
+jz   isdigit_B
+
+
+check_if_8_B :
+mov bh, 38h
+cmp al, bh
+jnz  check_if_9_B
+jz   isdigit_B
+
+
+check_if_9_B :
+mov bh, 39h
+cmp al, bh
+jnz  isletter_B
+jz   isdigit_B
+
+
+
+
+isdigit_B:
+sub al, 30h
+mov bl, 10h
+mul bl
+mov ch, al
+
+jmp  check_2nd_char_B
+
+isletter_B :
+sub al, 60h
+add al, 9h
+mov bl, 10h
+mul bl
+mov ch, al
+
+jmp  check_2nd_char_B
+
+
+check_2nd_char_B :
+mov al, value + 3
+mov bh, 30h
+cmp al, bh
+jnz  check_if_1_B_1
+jz   isdigit_B_1
+
+
+check_if_1_B_1 :
+mov bh, 31h
+cmp al, bh
+jnz  check_if_2_B_1
+jz   isdigit_B_1
+
+
+check_if_2_B_1 :
+mov bh, 32h
+cmp al, bh
+jnz  check_if_3_B_1
+jz   isdigit_B_1
+
+
+check_if_3_B_1 :
+mov bh, 33h
+cmp al, bh
+jnz  check_if_4_B_1
+jz   isdigit_B_1
+
+
+check_if_4_B_1 :
+mov bh, 34h
+cmp al, bh
+jnz  check_if_5_B_1
+jz   isdigit_B_1
+
+
+check_if_5_B_1 :
+mov bh, 35h
+cmp al, bh
+jnz  check_if_6_B_1
+jz   isdigit_B_1
+
+
+check_if_6_B_1 :
+mov bh, 36h
+cmp al, bh
+jnz  check_if_7_B_1
+jz   isdigit_B_1
+
+
+check_if_7_B_1 :
+mov bh, 37h
+cmp al, bh
+jnz  check_if_8_B_1
+jz   isdigit_B_1
+
+
+check_if_8_B_1 :
+mov bh, 38h
+cmp al, bh
+jnz  check_if_9_B_1
+jz   isdigit_B_1
+
+
+check_if_9_B_1 :
+mov bh, 39h
+cmp al, bh
+jnz  isletter_B_1
+jz   isdigit_B_1
+
+
+
+isdigit_B_1:; reg_Ax_1 + 3 is unit
+sub al, 30h
+add ch, al
+
+
+jmp  check_3rd_char_B
+
+
+isletter_B_1 :
+sub al, 60h
+add al, 9h
+add ch, al
+
+jmp  check_3rd_char_B
+check_3rd_char_B :
+mov al, value + 4
+mov bh, 30h
+cmp al, bh
+jnz  check_if_1_B_2
+jz   isdigit_B_2
+
+check_if_1_B_2 :
+mov bh, 31h
+cmp al, bh
+jnz  check_if_2_B_2
+jz   isdigit_B_2
+
+check_if_2_B_2 :
+mov bh, 32h
+cmp al, bh
+jnz  check_if_3_B_2
+jz   isdigit_B_2
+
+check_if_3_B_2 :
+mov bh, 33h
+cmp al, bh
+jnz  check_if_4_B_2
+jz   isdigit_B_2
+
+check_if_4_B_2 :
+mov bh, 34h
+cmp al, bh
+jnz  check_if_5_B_2
+jz   isdigit_B_2
+
+
+check_if_5_B_2 :
+mov bh, 35h
+cmp al, bh
+jnz  check_if_6_B_2
+jz   isdigit_B_2
+
+check_if_6_B_2 :
+mov bh, 36h
+cmp al, bh
+jnz  check_if_7_B_2
+jz   isdigit_B_2
+
+
+check_if_7_B_2 :
+mov bh, 37h
+cmp al, bh
+jnz  check_if_8_B_2
+jz   isdigit_B_2
+
+
+check_if_8_B_2 :
+mov bh, 38h
+cmp al, bh
+jnz  check_if_9_B_2
+jz   isdigit_B_2
+
+
+check_if_9_B_2 :
+mov bh, 39h
+cmp al, bh
+jnz  isletter_B_2
+jz   isdigit_B_2
+
+
+
+isdigit_B_2:; reg_Ax_1 + 4 is tens
+sub al, 30h
+mov bl, 10h
+mul bl
+mov cl, al
+
+
+jmp  check_4th_char_B
+
+
+isletter_B_2 :
+sub al, 60h
+add al, 9h
+mov bl, 10h
+mul bl
+mov cl, al
+
+
+check_4th_char_B :
+
+mov al, value + 5
+mov bh, 30h
+cmp al, bh
+jnz  check_if_1_B_3
+jz   isdigit_B_3
+
+
+check_if_1_B_3 :
+mov bh, 31h
+cmp al, bh
+jnz  check_if_2_B_3
+jz   isdigit_B_3
+
+
+check_if_2_B_3 :
+mov bh, 32h
+cmp al, bh
+jnz  check_if_3_B_3
+jz   isdigit_B_3
+
+
+check_if_3_B_3 :
+mov bh, 33h
+cmp al, bh
+jnz  check_if_4_B_3
+jz   isdigit_B_3
+
+
+check_if_4_B_3 :
+mov bh, 34h
+cmp al, bh
+jnz  check_if_5_B_3
+jz   isdigit_B_3
+
+
+check_if_5_B_3 :
+mov bh, 35h
+cmp al, bh
+jnz  check_if_6_B_3
+jz   isdigit_B_3
+
+
+check_if_6_B_3 :
+mov bh, 36h
+cmp al, bh
+jnz  check_if_7_B_3
+jz   isdigit_B_3
+
+check_if_7_B_3 :
+mov bh, 37h
+cmp al, bh
+jnz  check_if_8_B_3
+jz   isdigit_B_3
+
+
+check_if_8_B_3 :
+mov bh, 38h
+cmp al, bh
+jnz  check_if_9_B_3
+jz   isdigit_B_3
+
+check_if_9_B_3 :
+mov bh, 39h
+cmp al, bh
+jnz  isletter_B_3
+jz   isdigit_B_3
+
+
+
+isdigit_B_3:; reg_Ax_1 + 5 is unit
+sub al, 30h
+add cl, al
+
+
+jmp  finish_check_digits_and_letters_of_input_B
+
+isletter_B_3 :
+sub al, 60h
+add al, 9h
+add cl, al
+
+
+finish_check_digits_and_letters_of_input_B :
+
+mov ax, cx
+ 
+       
+  mov bx,real_reg_bx_2
+  sub bx,ax
+  mov real_reg_bx_2,bx     
+  jmp continue 
+ 
+
+getRegisterName_bx_sub_op2:
+
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+
+
+ mov ah,9
+        mov dx,offset Mess_operand_2
+        int 21h
+
+        ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset operand_2
+        int 21h 
+
+
+
+;check if register is ax or al or ah         
+mov si,offset [operand_2+2]
+mov bl,61h  ;ascii of a 
+cmp bl,[si]
+jz AX_check_7
+jnz another_register_name_check_1_7
+
+
+Ax_check_7:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz bx_sub_ax
+jnz error_Register_name_bx_sub
+
+bx_sub_ax:
+mov ax, real_reg_bx_2
+mov bx,real_reg_Ax_2
+sub ax,bx
+mov real_reg_Ax_2,ax 
+jmp continue 
+
+
+
+
+another_register_name_check_1_7:
+;check if register is bx          
+mov si,offset [operand_2+2]
+mov bl,62h  ;ascii of b 
+cmp bl,[si]
+jz bx_check_7
+jnz another_register_name_check_2_7
+
+bx_check_7:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz bx_sub_bx
+jnz another_compare_of_bx_1_7
+
+
+bx_sub_bx:
+mov ax,real_reg_bx_2
+mov bx,real_reg_bx_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue
+
+another_compare_of_bx_1_7:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz sizemismatch4
+jnz another_compare_of_bx_2_7
+
+another_compare_of_bx_2_7:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz sizemismatch4
+jnz compare_BP_7
+
+ 
+
+
+; to check if register is BP or not
+compare_BP_7:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz bx_sub_BP
+jnz error_register_name_bx_sub
+
+bx_sub_BP:
+mov ax,real_reg_bx_2
+mov bx,real_reg_BP_2
+sub ax,bx 
+mov real_reg_bx_2,ax
+jmp continue  
+ 
+another_register_name_check_2_7: 
+;check if register is cx         
+mov si,offset [operand_2+2]
+mov bl,63h  ;ascii of c 
+cmp bl,[si]
+jz cX_check_7
+jnz another_register_name_check_3_7
+
+
+cx_check_7:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz bx_sub_cx
+jnz error_register_name_bx_sub
+
+bx_sub_cx:
+mov ax,real_reg_bx_2
+mov bx,real_reg_cx_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue 
+
+another_compare_of_cx_1_7:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz sizemismatch4
+jnz another_compare_of_cx_2_7
+ 
+jmp continue
+
+another_compare_of_cx_2_7:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz sizemismatch4
+jnz error_Register_name_bx_sub
+
+
+another_register_name_check_3_7:
+;check if register is dx or dl or dh         
+mov si,offset [operand_2+2]
+mov bl,64h  ;ascii of d 
+cmp bl,[si]
+jz dX_check_7
+jnz another_register_name_check_4_7
+
+
+dx_check_7:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz bx_sub_dx
+jnz another_compare_of_dx_1_7
+
+bx_sub_dx:
+mov ax,real_reg_bx_2
+mov bx,real_reg_dx_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue 
+
+another_compare_of_dx_1_7:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz sizemismatch4
+jnz another_compare_of_dx_2_7
+
+another_compare_of_dx_2_7:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz sizemismatch4
+jnz Compare_DI_7
+
+; to check if register is DI or not
+compare_DI_7:
+mov bl,69h ;ascii of i
+cmp bl,[si]
+jz bx_sub_DI
+jnz error_register_name_bx_sub
+
+bx_sub_DI:
+mov ax,real_reg_bx_2
+mov bx,real_reg_di_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue  
+
+another_register_name_check_4_7:
+mov bl,73h ; ascii of s
+cmp bl,[si]
+jz check_si_7
+jnz error_register_name_bx_sub
+
+check_si_7:
+mov bl,69h ;ascii of  i
+cmp bl,[si]
+jz bx_sub_si
+jnz check_sp_7
+
+bx_sub_si:
+mov ax,real_reg_bx_2
+mov bx,real_reg_si_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue 
+
+check_sp_7:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz bx_sub_sp
+jnz error_register_name_bx_sub
+
+bx_sub_sp:
+mov ax,real_reg_bx_2
+mov bx,real_reg_sp_2
+sub ax,bx 
+mov real_reg_ax_2,ax
+jmp continue
+
+;;;;;;;;;;;;;;;;;;;;;;;;bx_sub_?;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;endofcode
+;;;;;;;;;;;;;;;;;;;;;;;;bh_sub_?;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;startofcode
+bh_sub_?:
+mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ 
+ mov ah,9
+ mov dx,offset value_OR_register
+ int 21h
+ 
+ ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset vORr
+        int 21h                                                                      
+        
+        mov ah,vORr+2
+        mov al,72h  ;ascii of r
+        mov bl,76h  ;ascii of v
+        cmp ah,al
+        jz getRegisterName_bh_sub_op2
+        cmp ah,bl 
+        jz getValue_bh_sub_op2
+        
+         
+        
+        
+getValue_bh_sub_op2:
+mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+mov ah,9
+mov dx,offset Mess_value
+int 21h
+
+mov ah,0AH 
+mov dx,offset value2        
+int 21h 
+
+    ;check_digits_or_letters value
+     
+  mov al,value2+2
+          mov bh,30h
+       cmp al,bh
+       jnz  check_if_1C
+       jz   isdigitC
+       
+       check_if_1C:
+       mov bh,31h
+       cmp al,bh
+       jnz  check_if_2C
+       jz   isdigitC
+       
+        check_if_2C:
+       mov bh,32h
+       cmp al,bh
+       jnz  check_if_3C
+       jz   isdigitC 
+       
+        check_if_3C:
+       mov bh,33h
+       cmp al,bh
+       jnz  check_if_4C
+       jz   isdigitC
+       
+         check_if_4C:
+       mov bh,34h
+       cmp al,bh
+       jnz  check_if_5C
+       jz   isdigitC 
+        
+       
+        check_if_5C:
+       mov bh,35h
+       cmp al,bh
+       jnz  check_if_6C
+       jz   isdigitC
+       
+	   
+        check_if_6C:
+       mov bh,36h
+       cmp al,bh
+       jnz  check_if_7C
+       jz   isdigitC 
+        
+	
+       check_if_7C:
+       mov bh,37h
+       cmp al,bh
+       jnz  check_if_8C
+       jz   isdigitC 
+        
+	
+      check_if_8C:
+       mov bh,38h
+       cmp al,bh
+       jnz  check_if_9C
+       jz   isdigitC
+       
+	   
+        check_if_9C:
+       mov bh,39h
+       cmp al,bh
+       jnz  isletterB
+       jz   isdigitC
+       
+
+       
+       
+        isdigitC:
+       sub al,30h
+       mov bl,10h
+       mul bl
+       mov ch,al
+       
+       jmp  check_2nd_charB
+       
+        isletterC:
+       sub al,60h
+       add al,9h
+       mov bl,10h
+       mul bl
+       mov ch,al
+       
+       jmp  check_2nd_charC 
+       
+       
+        check_2nd_charC:
+       mov al,value2+3
+       mov bh,30h
+       cmp al,bh
+       jnz  check_if_1C1_
+       jz   isdigitC1_
+       
+	   
+        check_if_1C1_:
+       mov bh,31h
+       cmp al,bh
+       jnz  check_if_2C1_
+       jz   isdigitC1_
+       
+	   
+        check_if_2C1_:
+       mov bh,32h
+       cmp al,bh
+       jnz  check_if_3C1_
+       jz   isdigitC1_ 
+       
+	   
+        check_if_3C1_:
+       mov bh,33h
+       cmp al,bh
+       jnz  check_if_4C1_
+       jz   isdigitC1_
+        
+	
+        check_if_4C1_:
+       mov bh,34h
+       cmp al,bh
+       jnz  check_if_5C1_
+       jz   isdigitC1_ 
+        
+        
+       check_if_5C1_:
+       mov bh,35h
+       cmp al,bh
+       jnz  check_if_6C1_
+       jz   isdigitC1_
+       
+	   
+       check_if_6C1_:
+       mov bh,36h
+       cmp al,bh
+       jnz  check_if_7C1_
+       jz   isdigitC1_ 
+        
+		
+       check_if_7C1_:
+       mov bh,37h
+       cmp al,bh
+       jnz  check_if_8C1_
+       jz   isdigitC1_ 
+        
+		
+       check_if_8C1_:
+       mov bh,38h
+       cmp al,bh
+       jnz  check_if_9C1_
+       jz   isdigitC1_
+       
+	   
+       check_if_9C1_:
+       mov bh,39h
+       cmp al,bh
+       jnz  isletterB1_
+       jz   isdigitC1_
+       
+       
+       
+        isdigitC1_: ;reg_Ax_1+3 is unit 
+       sub al,30h
+       add ch,al
+       
+       
+       jmp  finish_check_digits_and_letters_of_inputC
+       
+	   
+       isletterC1_:
+       sub al,60h
+       add al,9h
+       add ch,al
+       
+       jmp  finish_check_digits_and_letters_of_inputC
+        
+       
+       finish_check_digits_and_letters_of_inputC:
+       
+       mov ax,cx
+     
+       mov bh,ah
+       mov bl,byte ptr real_reg_bx_2+1
+       sub bl,bh
+       mov byte ptr real_reg_bx_2+1,bl 
+       
+       jmp continue   
+      
+
+
+
+
+getRegisterName_bh_sub_op2:
+
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+
+
+ mov ah,9
+        mov dx,offset Mess_operand_2
+        int 21h
+
+        ;receive input from user 
+        mov ah,0AH 
+        mov dx,offset operand_2
+        int 21h 
+
+
+
+;check if register is ax or al or ah         
+mov si,offset [operand_2+2]
+mov bl,61h  ;ascii of a 
+cmp bl,[si]
+jz AX_check_8
+jnz another_register_name_check_1_8
+
+
+Ax_check_8:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch5
+jnz another_compare_ax_1_8
+
+another_compare_ax_1_8:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz bh_sub_ah
+jnz another_compare_of_ax_2_8
+
+
+bh_sub_ah:
+mov ah,byte ptr real_reg_bx_2+1
+mov bh,byte ptr real_reg_Ax_2+1
+sub ah,bh
+mov byte ptr real_reg_bx_2+1,ah 
+jmp continue
+
+another_compare_of_ax_2_8:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz bh_sub_al
+jnz error_Register_name_bh_sub 
+
+bh_sub_al:
+mov ah, byte ptr real_reg_bx_2+1
+mov bh,byte ptr real_reg_Ax_2
+sub ah,bh
+mov byte ptr real_reg_bx_2+1,ah 
+jmp continue
+
+
+another_register_name_check_1_8:
+;check if register is bx          
+mov si,offset [operand_2+2]
+mov bl,62h  ;ascii of b 
+cmp bl,[si]
+jz bx_check_8
+jnz another_register_name_check_2_8
+
+bx_check_8:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch5
+jnz another_compare_of_bx_1_8
+
+
+another_compare_of_bx_1_8:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz bh_sub_bh
+jnz another_compare_of_bx_2_8
+
+bh_sub_bh:
+mov ah,byte ptr real_reg_bx_2+1
+mov bh,byte ptr real_reg_bx_2+1
+sub ah,bh
+mov byte ptr real_reg_bx_2+1,ah 
+jmp continue
+
+
+another_compare_of_bx_2_8:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz ah_sub_bl
+jnz compare_BP_8 
+
+
+bh_sub_bl:
+mov ah,byte ptr real_reg_bx_2+1
+mov bh,byte ptr real_reg_bx_2
+sub ah,bh
+mov byte ptr real_reg_bx_2+1,ah 
+jmp continue
+
+; to check if register is BP or not
+compare_BP_8:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz sizemismatch5
+jnz error_register_name_bh_sub
+  
+ 
+another_register_name_check_2_8: 
+;check if register is cx         
+mov si,offset [operand_2+2]
+mov bl,63h  ;ascii of c 
+cmp bl,[si]
+jz cX_check_8
+jnz another_register_name_check_3_8
+
+
+cx_check_8:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch5
+jnz another_compare_of_cx_1_8
+ 
+
+another_compare_of_cx_1_8:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz bh_sub_ch
+jnz another_compare_of_cx_2_8
+
+bh_sub_ch:
+mov ah,byte ptr real_reg_bx_2+1
+mov bh,byte ptr real_reg_cx_2+1
+sub ah,bh
+mov byte ptr real_reg_bx_2+1,ah 
+jmp continue
+ 
+
+another_compare_of_cx_2_8:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz bh_sub_cl
+jnz error_Register_name_bh_sub
+
+bh_sub_cl:
+mov ah,byte ptr real_reg_bx_2+1
+mov bh,byte ptr real_reg_cx_2
+sub ah,bh
+mov byte ptr real_reg_bx_2+1,ah 
+jmp continue
+
+
+another_register_name_check_3_8:
+;check if register is dx or dl or dh         
+mov si,offset [operand_2+2]
+mov bl,64h  ;ascii of d 
+cmp bl,[si]
+jz dX_check_8
+jnz another_register_name_check_4_8
+
+
+dx_check_8:
+mov bl,78h  ;ascii of x
+inc si
+cmp bl,[si]
+jz sizemismatch5
+jnz another_compare_of_dx_1_8
+ 
+
+another_compare_of_dx_1_8:
+mov bl,68h ;ascii of h
+cmp bl,[si]
+jz bh_sub_dh
+jnz another_compare_of_dx_2_8
+
+bh_sub_dh:
+mov ah,byte ptr real_reg_bx_2+1
+mov bh,byte ptr real_reg_dx_2+1
+sub ah,bh
+mov byte ptr real_reg_bx_2+1,ah 
+jmp continue
+
+another_compare_of_dx_2_8:
+mov bl,6ch ; ascii of l
+cmp bl ,[si]
+jz bh_sub_dl
+jnz Compare_DI_8
+
+bh_sub_dl:
+mov ah,byte ptr real_reg_bx_2+1
+mov bh,byte ptr real_reg_dx_2
+sub ah,bh
+mov byte ptr real_reg_bx_2+1,ah 
+jmp continue
+
+; to check if register is DI or not
+compare_DI_8:
+mov bl,69h ;ascii of i
+cmp bl,[si]
+jz sizemismatch5
+jnz error_register_name_bh_sub
+  
+
+another_register_name_check_4_8:
+mov bl,73h ; ascii of s
+cmp bl,[si]
+jz check_si_8
+jnz error_register_name_bh_sub
+
+check_si_8:
+mov bl,69h ;ascii of  i
+cmp bl,[si]
+jz sizemismatch5
+jnz check_sp_8 
+
+check_sp_8:
+mov bl,70h ;ascii of p
+cmp bl,[si]
+jz sizemismatch5
+jnz error_register_name_bh_sub
+
+
+;;;;;;;;;;;;;;;;;;;;;;;bh_sub_?;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;endofcode
+
+
+jmp continue
+ 
+            
+
+
+
+
+
+  
+    
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;command_SUB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+                                                                                                                     
+jmp continue 
+
+   
+
+
+
+
+error_command:
+
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset wrong_Command
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h       
+
+ jmp start       
+ 
+error_Register_name_INC:
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset error_register
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ jmp getRegisterName_INC 
+ 
+ 
+ error_Register_name_dec:
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset error_register
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ jmp getRegisterName_dec
+ 
+ 
+  error_Register_name_sub_op1:
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset error_register
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ jmp getRegisterName_sub_op1
+ 
+  error_Register_name_sub_op2:  ;ax sub
+ mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset error_register
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h
+ 
+ jmp getRegisterName_sub_op2
+ 
+ 
+ sizemismatch:
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset size_mismatch
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+jmp getRegisterName_sub_op2
+
+
+error_Register_name_ah_sub:    ;ah sub
+
+mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset error_register
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21
+ 
+jmp getRegisterName_ah_sub_op2
+ 
+sizemismatch2:
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset size_mismatch
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+jmp getRegisterName_ah_sub_op2
+
+
+error_Register_name_al_sub:    ;al sub
+
+mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset error_register
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21
+ 
+jmp getRegisterName_al_sub_op2
+
+
+sizemismatch3:
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset size_mismatch
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+jmp getRegisterName_al_sub_op2
+
+error_Register_name_bx_sub:    ;al sub
+
+mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset error_register
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21
+ 
+jmp getRegisterName_bx_sub_op2
+
+sizemismatch4:
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset size_mismatch
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+jmp getRegisterName_bx_sub_op2
+
+
+
+error_Register_name_bh_sub:    ;bh sub
+
+mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset error_register
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21
+ 
+jmp getRegisterName_bh_sub_op2
+ 
+sizemismatch5:
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h
+
+ mov ah,9
+ mov dx,offset size_mismatch
+ int 21h
+ 
+  mov ah,9
+ mov dx,offset newline
+ int 21h 
+ 
+jmp getRegisterName_bh_sub_op2
+continue:
+ret
+function_taking_commands endp
       
 
      end main 
