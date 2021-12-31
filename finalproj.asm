@@ -123,6 +123,13 @@ real_memory_8_2 db 00h
 real_memory_9_2 db 00h
 real_memory_A_2 db 00h
 
+;array of locations for memory to print it (10 names for 10 locations)
+memory_locations_names db '0','$','1','$','2','$','3','$','4','$','5','$','6','$','7','$','8','$','9','$','A','$'
+;array of locations for memory to print it (10 names for 10 locations)
+registers_names db 'A','X','$','B','X','$','C','X','$','D','X','$','S','I','$','D','I','$','S','P','$','B','P','$'
+;value to put in register and win the game
+value_in_REG_to_win dw 105eh
+
 ;ky try check github
 ;;;;;;varibles for commands
 Mess_command db 'Please enter your command:','$'
@@ -491,7 +498,7 @@ int 10h
 print_Middle_graphic_screen  proc   
     mov bx,0h  ;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
     mov ah,2     ;move cursor
-    mov dx,0505h     ;the midlle of the screen kkkkkkkkkkkkkkkkkkkkkkkkk  0718h
+    mov dx,0019h     ;the midlle of the screen kkkkkkkkkkkkkkkkkkkkkkkkk  0718h
     mov di,dx ;to protect the last starting location kkkkkkkkkkkkkkkkkkkkkkkkkkk******************************** step 1   -->step 2 call PROC print_sameX_incY
     int 10h        
      
@@ -644,15 +651,8 @@ hlt
                         cmp dx,176d
                         jnz back_to_draw_line
                         
-      mov cx,145d ;########################################################################### print vertical sep line for memoryyyy_1
-      mov dx,0
-      mov al,0eh
-      mov ah,0ch
-      back_to_draw_line_memory_1:int 10h
-                        inc dx
-                        cmp dx,176d
-                        jnz back_to_draw_line_memory_1
-      mov cx,126d ;########################################################################### print vertical sep line for memoryyy_1_1
+
+      mov cx,133d ;########################################################################### print vertical sep line for memoryyy_1_129/12/2021 changed numbers**
       mov dx,0
       mov al,0eh
       mov ah,0ch
@@ -660,15 +660,15 @@ hlt
                         inc dx
                         cmp dx,176d
                         jnz back_to_draw_line_memory_1_1
-      mov cx,305d ;########################################################################### print vertical sep line for memoryyyy_2
-      mov dx,0
-      mov al,0eh
-      mov ah,0ch
-      back_to_draw_line_memory_2:int 10h
-                        inc dx
-                        cmp dx,176d
-                        jnz back_to_draw_line_memory_2
-      mov cx,286d ;########################################################################### print vertical sep line for memoryyyy_2_2
+     ; mov cx,305d ;########################################################################### print vertical sep line for memoryyyy_2   29/12/2021 commented***
+     ; mov dx,0
+     ; mov al,0eh
+     ; mov ah,0ch
+     ; back_to_draw_line_memory_2:int 10h
+     ;                   inc dx
+     ;                   cmp dx,176d
+     ;                   jnz back_to_draw_line_memory_2
+      mov cx,293d ;########################################################################### print vertical sep line for memoryyyy_2_2 29/12/2021 changed***
       mov dx,0
       mov al,0eh
       mov ah,0ch
@@ -687,41 +687,41 @@ hlt
                         jnz back_to_draw_inline_chat_lines  
                        
 
-      mov bl,10d  ;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& no. of line in the memory_1
-      mov dx,12d ;separation between 2 memory lines
+      mov bl,10d  ;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& no. of line in the memory_129/12/2021 changed***
+      mov dx,16d ;separation between 2 memory lines
       loop_print_horiz_lines_memory_1:
       
 
-      mov cx,126d ;&&&&&&&&&&&&&&&&print horizontal sep line memory&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      mov cx,133d ;&&&&&&&&&&&&&&&&print horizontal sep line memory&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 29/12/2021 changed***
       
       mov al,0eh
       mov ah,0ch
       back_to_draw_line_memory_horiz_1:int 10h
                         inc cx
-                        cmp cx,145d
+                        cmp cx,160d
                         jnz back_to_draw_line_memory_horiz_1
         
         add dx,16d
         dec bl
         jnz loop_print_horiz_lines_memory_1      
 
-        mov bl,10d  ;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& no. of line in the memory_2
-      mov dx,12d ;separation between 2 memory lines
+        mov bl,10d  ;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& no. of line in the memory_2 29/12/2021 changed***
+      mov dx,16d ;separation between 2 memory lines
       loop_print_horiz_lines_memory_2:
       
 
-      mov cx,286d ;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&print horizontal sep line memory
+      mov cx,293d ;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&print horizontal sep line memory29/12/2021 changed***
       
       mov al,0eh ;color white
       mov ah,0ch
       back_to_draw_line_memory_horiz_2:int 10h
                         inc cx
-                        cmp cx,305d
+                        cmp cx,320d
                         jnz back_to_draw_line_memory_horiz_2 
         
         add dx,16d
         dec bl
-        jnz loop_print_horiz_lines_memory_2   
+        jnz loop_print_horiz_lines_memory_2    
 
         ;//print registers &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         
@@ -730,11 +730,15 @@ hlt
      call print_memory_names
      
      call update_players_registers_values;to be removed and put it in gameflow
-     call print_register_values ;to be removed and put it in gameflow  
+     call print_register_values ;to be removed and put it in gameflow
      call update_players_memory_values ;;to be removed and put it in gameflow
      call print_memory_values ;;to be removed and put it in gameflow
+      
+    
+      
+      
        ;#####################################################print names
-      mov ah,2h ;name 1 print
+      mov ah,2h ;name 1 print 
       mov bx,0h  
       mov dx,3020h
       int 10h
@@ -778,20 +782,7 @@ hlt
                                   mov [pts2+2],al
                     
       finished_total_points:
-      ;call gameflow ####################################################################################   uncomment later
-      
-                        
-      ;mov ah,2     ;move cursor to the middle of the screen    ;################    commented because no need it is just example of int 10/0eh
-      ;mov bx,0h  ;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
-      ;mov dx,3026h
-      ;int 10h                  
-            
-      ;mov ah,0eh    ;int to print char in graphical mode
-      ;mov al,'2'  
-      ;mov bl, 0eh   
-      ;int 10h
-      
-    
+      call gameflow 
     ret
      
      gamemodesetup endp 
@@ -800,7 +791,7 @@ hlt
       gameflow proc   
             
         ;loop until one player points =0 then game ended
-        whileNoWinner: mov al,pts1+2
+       whileNoWinner: mov al,pts1+2
                        mov ah,pts2+2
                        cmp al,0h         ;check player 1 points =0 then P1 looser, P2 winner
                        jnz checkPlayer1_points
@@ -811,19 +802,92 @@ hlt
                                             jnz continue_game_no_winner
                                             call player1_winner
                                             jmp finish_game  
+              
                                             
                                             
                        continue_game_no_winner:
-		       call function_taking_commands
-		       call print_register_values
+                       call update_players_memory_values
+                       call update_players_registers_values
+                       call print_register_values
                        call print_memory_values
-		       
+
+
+                       ;user enters here the command he wants
+		       call function_taking_commands
+                                            ; dummy to try to recieve data from user in graphic mode
+    ;mov bx,0h  ;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+    ;mov ah,2     ;move cursor
+    ;mov dx,1100h     ;the midlle of the screen 0718h
+    ;mov di,dx ;to protect the last starting location 
+    ;int 10h             
+
+    ;disp message to ask user what he has to enter
+    ;mov ah,9                            ; display message for entering name dummy
+;LEA dx, disp_mes_enter_command
+;int 21h 
+
+ ;    mov ah,0Ah
+  ;   LEA dx, enter_command
+   ;  int 21h     
+     
+                        ;to print on screen
+                        call update_players_memory_values
+                       call update_players_registers_values
+                       call print_register_values
+                       call print_memory_values
+                       ;check if the points of a player is zero or a player entered required value in the register
+                       mov al,pts1+2
+                       mov ah,pts2+2
+                       cmp al,0h         ;check player 1 points =0 then P1 looser, P2 winner
+                       jnz checkPlayer1_points_after_player_1
+                       call player2_winner
+                       jmp finish_game        
+                       
+                       checkPlayer1_points_after_player_1: cmp ah,0h                  ;check player 2 points =0 then P2 looser, P1 winner
+                                            jnz continue_game_no_winner_after_player_1
+                                            call player1_winner
+                                            jmp finish_game 
+                     continue_game_no_winner_after_player_1: 
+
+                     call check_if_value_105eh_in_ANY_reg_after_player_1_reg_2
+                     jnz continue_game_no_winner_after_check_reg_2_required_value
+                      jz player2_winner
+                      jmp finish_game
                        ;game logic                     
+                     continue_game_no_winner_after_check_reg_2_required_value:
+
+                     ;player 2 enters the comand he wats
+
+                     ;to print on screen
+                        call update_players_memory_values
+                       call update_players_registers_values
+                       call print_register_values
+                       call print_memory_values
+                                            ;check if the points of a player is zero or a player entered required value in the register
+                       mov al,pts1+2
+                       mov ah,pts2+2
+                       cmp al,0h         ;check player 1 points =0 then P1 looser, P2 winner
+                       jnz checkPlayer1_points_after_player_2
+                       call player2_winner
+                       jmp finish_game        
+                       
+                       checkPlayer1_points_after_player_2: cmp ah,0h                  ;check player 2 points =0 then P2 looser, P1 winner
+                                            jnz continue_game_no_winner_after_player_2
+                                            call player1_winner
+                                            jmp finish_game 
+                     continue_game_no_winner_after_player_2: 
+                     call check_if_value_105eh_in_ANY_reg_after_player_2_reg_1
+                      jnz continue_game_no_winner_after_check_reg_1_required_value
+                      jz player1_winner
+                      jmp finish_game
+                       ;game logic                     
+                     continue_game_no_winner_after_check_reg_1_required_value:
+
         
                        ; trial to finish game
-                       mov al,pts1+2
-                       dec al
-                       mov pts1+2,al
+                       ;mov al,pts1+2
+                       ;dec al
+                      ; mov pts1+2,al
         jmp    whileNoWinner
         
         finish_game:
@@ -832,7 +896,37 @@ hlt
         
         ret
         gameflow endp   
+	 ;////////////////// 
+      check_if_value_105eh_in_ANY_reg_after_player_1_reg_2 proc
+mov ax,105eh
+mov real_reg_Ax_2,ax
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_Ax_2
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jz player1_winner
+;continue all reg_2
+
+ret
+check_if_value_105eh_in_ANY_reg_after_player_1_reg_2 endp
+
+         ;////////////////// 
+check_if_value_105eh_in_ANY_reg_after_player_2_reg_1 proc
+       mov ax,ds
+
+       mov es,ax
+       mov si,offset real_reg_Ax_1
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
       
+;continue all reg_1
+
+ret
+check_if_value_105eh_in_ANY_reg_after_player_2_reg_1 endp
+
          ;////////////////// 
          
          player2_winner proc  
@@ -1216,7 +1310,7 @@ jnz loop92
     ;///reg of player 1 
     ;reg ax 1
     mov ax,0c05h ; color purple (05)
-    mov cx,15d ;initial position (for reg Ax)
+    mov cx,17d ;initial position (for reg Ax)
         mov dx,12d 
     cote1_reg_Ax_1:int 10h
           inc cx
@@ -1229,7 +1323,7 @@ jnz loop92
            jnz cote2_reg_Ax_1
     cote3_reg_Ax_1: int 10h        
            dec cx
-           cmp cx,15d 
+           cmp cx,17d 
            jnz cote3_reg_Ax_1
     cote4_reg_Ax_1: int 10h
            dec dx
@@ -1238,7 +1332,7 @@ jnz loop92
 
 ;reg bx 1
      mov ax,0c05h ; color purple (05)
-    mov cx,15d ;initial position (for reg Ax)
+    mov cx,17d ;initial position (for reg Ax)
         mov dx,32d 
     cote1_reg_bx_1:int 10h
           inc cx
@@ -1251,7 +1345,7 @@ jnz loop92
            jnz cote2_reg_bx_1
     cote3_reg_bx_1: int 10h        
            dec cx
-           cmp cx,15d 
+           cmp cx,17d 
            jnz cote3_reg_bx_1
     cote4_reg_bx_1: int 10h
            dec dx
@@ -1260,7 +1354,7 @@ jnz loop92
 
 ;reg cx 1
     mov ax,0c05h ; color purple (05)
-    mov cx,15d ;initial position (for reg Ax)
+    mov cx,17d ;initial position (for reg Ax)
         mov dx,52d 
     cote1_reg_cx_1:int 10h
           inc cx
@@ -1273,7 +1367,7 @@ jnz loop92
            jnz cote2_reg_cx_1
     cote3_reg_cx_1: int 10h        
            dec cx
-           cmp cx,15d 
+           cmp cx,17d 
            jnz cote3_reg_cx_1
     cote4_reg_cx_1: int 10h
            dec dx
@@ -1282,7 +1376,7 @@ jnz loop92
 
 ;reg dx 1
            mov ax,0c05h ; color purple (05)
-    mov cx,15d ;initial position (for reg Ax)
+    mov cx,17d ;initial position (for reg Ax)
         mov dx,72d 
     cote1_reg_dx_1:int 10h
           inc cx
@@ -1295,7 +1389,7 @@ jnz loop92
            jnz cote2_reg_dx_1
     cote3_reg_dx_1: int 10h        
            dec cx
-           cmp cx,15d 
+           cmp cx,17d 
            jnz cote3_reg_dx_1
     cote4_reg_dx_1: int 10h
            dec dx
@@ -1304,12 +1398,12 @@ jnz loop92
 
            
 ;reg SI 1
-    mov ax,0c05h ; color purple (05)
+    mov ax,0c05h ; color purple (05)                                           29/12/2021 changed***
     mov cx,66d ;initial position (for reg Ax) box size: 45 w and 14 l
         mov dx,12d 
     cote1_reg_SI_1:int 10h
           inc cx
-          cmp cx,111d
+          cmp cx,107d
           jnz cote1_reg_SI_1
     
     cote2_reg_SI_1: int 10h
@@ -1326,12 +1420,12 @@ jnz loop92
            jnz cote4_reg_SI_1   
 
 ;reg DI 1
-     mov ax,0c05h ; color purple (05)
+     mov ax,0c05h ; color purple (05)                  29/12/2021 changed***
     mov cx,66d ;initial position (for reg Ax)
         mov dx,32d 
     cote1_reg_DI_1:int 10h
           inc cx
-          cmp cx,111d
+          cmp cx,107d
           jnz cote1_reg_DI_1
     
     cote2_reg_DI_1: int 10h
@@ -1348,12 +1442,12 @@ jnz loop92
            jnz cote4_reg_DI_1     
 
 ;reg SP 1
-    mov ax,0c05h ; color purple (05)
+    mov ax,0c05h ; color purple (05)                           29/12/2021 changed***
     mov cx,66d ;initial position (for reg Ax)
         mov dx,52d 
     cote1_reg_SP_1:int 10h
           inc cx
-          cmp cx,111d
+          cmp cx,107d
           jnz  cote1_reg_SP_1
     
     cote2_reg_SP_1: int 10h
@@ -1370,12 +1464,12 @@ jnz loop92
            jnz cote4_reg_SP_1 
 
 ;reg BP 1
-           mov ax,0c05h ; color purple (05)
+           mov ax,0c05h ; color purple (05)                       29/12/2021 changed***
     mov cx,66d ;initial position (for reg Ax)
         mov dx,72d 
     cote1_reg_BP_1:int 10h
           inc cx
-          cmp cx,111d
+          cmp cx,107d
           jnz cote1_reg_BP_1
     
     cote2_reg_BP_1: int 10h
@@ -1394,8 +1488,8 @@ jnz loop92
 
     ;///reg of player 2 ///////////////
 ;reg Ax 2
-    mov ax,0c05h ; color purple (05)
-    mov cx,180d ;initial position (for reg Ax) box size: 45 w and 14 l
+    mov ax,0c05h ; color purple (05)                                         29/12/2021 changed***
+    mov cx,185d ;initial position (for reg Ax) box size: 45 w and 14 l
         mov dx,12d 
     cote1_reg_Ax_2:int 10h
           inc cx
@@ -1408,7 +1502,7 @@ jnz loop92
            jnz cote2_reg_Ax_2
     cote3_reg_Ax_2: int 10h        
            dec cx
-           cmp cx,180d 
+           cmp cx,185d 
            jnz cote3_reg_Ax_2
     cote4_reg_Ax_2: int 10h
            dec dx
@@ -1416,8 +1510,8 @@ jnz loop92
            jnz cote4_reg_Ax_2   
 
 ;reg bx 2
-     mov ax,0c05h ; color purple (05)
-    mov cx,180d ;initial position (for reg Ax)
+     mov ax,0c05h ; color purple (05)                        29/12/2021 changed***
+    mov cx,185d ;initial position (for reg Ax)
         mov dx,32d 
     cote1_reg_bx_2:int 10h
           inc cx
@@ -1430,7 +1524,7 @@ jnz loop92
            jnz cote2_reg_bx_2
     cote3_reg_bx_2: int 10h        
            dec cx
-           cmp cx,180d 
+           cmp cx,185d 
            jnz cote3_reg_bx_2
     cote4_reg_bx_2: int 10h
            dec dx
@@ -1438,8 +1532,8 @@ jnz loop92
            jnz cote4_reg_bx_2     
 
 ;reg cx 2
-    mov ax,0c05h ; color purple (05)
-    mov cx,180d ;initial position (for reg Ax)
+    mov ax,0c05h ; color purple (05)                        29/12/2021 changed***
+    mov cx,185d ;initial position (for reg Ax)                  
         mov dx,52d 
     cote1_reg_cx_2:int 10h
           inc cx
@@ -1452,7 +1546,7 @@ jnz loop92
            jnz cote2_reg_cx_2
     cote3_reg_cx_2: int 10h        
            dec cx
-           cmp cx,180d 
+           cmp cx,185d 
            jnz cote3_reg_cx_2
     cote4_reg_cx_2: int 10h
            dec dx
@@ -1460,8 +1554,8 @@ jnz loop92
            jnz cote4_reg_cx_2 
 
 ;reg dx 2
-           mov ax,0c05h ; color purple (05)
-    mov cx,180d ;initial position (for reg Ax)
+           mov ax,0c05h ; color purple (05)                     29/12/2021 changed***
+    mov cx,185d ;initial position (for reg Ax)
         mov dx,72d 
     cote1_reg_dx_2:int 10h
           inc cx
@@ -1474,19 +1568,19 @@ jnz loop92
            jnz cote2_reg_dx_2
     cote3_reg_dx_2: int 10h        
            dec cx
-           cmp cx,180d 
+           cmp cx,185d 
            jnz cote3_reg_dx_2
     cote4_reg_dx_2: int 10h
            dec dx
            cmp dx, 72d 
            jnz cote4_reg_dx_2 
 ;reg SI 2
-    mov ax,0c05h ; color purple (05)
+    mov ax,0c05h ; color purple (05)                                       29/12/2021 changed***
     mov cx,230d ;initial position (for reg Ax) box size: 45 w and 14 l
         mov dx,12d 
     cote1_reg_SI_2:int 10h
           inc cx
-          cmp cx,275d
+          cmp cx,270d
           jnz cote1_reg_SI_2
     
     cote2_reg_SI_2: int 10h
@@ -1502,13 +1596,13 @@ jnz loop92
            cmp dx, 12d 
            jnz cote4_reg_SI_2   
 
-;reg DI 2
+;reg DI 2                                              29/12/2021 changed***
      mov ax,0c05h ; color purple (05)
     mov cx,230d ;initial position (for reg Ax)
         mov dx,32d 
     cote1_reg_DI_2:int 10h
           inc cx
-          cmp cx,275d
+          cmp cx,270d
           jnz cote1_reg_DI_2
     
     cote2_reg_DI_2: int 10h
@@ -1525,12 +1619,12 @@ jnz loop92
            jnz cote4_reg_DI_2     
 
 ;reg SP 2
-    mov ax,0c05h ; color purple (05)
+    mov ax,0c05h ; color purple (05)                 29/12/2021 changed***
     mov cx,230d ;initial position (for reg Ax)
         mov dx,52d 
     cote1_reg_SP_2:int 10h
           inc cx
-          cmp cx,275d
+          cmp cx,270d
           jnz  cote1_reg_SP_2
     
     cote2_reg_SP_2: int 10h
@@ -1547,12 +1641,12 @@ jnz loop92
            jnz cote4_reg_SP_2 
 
 ;reg BP 2
-           mov ax,0c05h ; color purple (05)
+           mov ax,0c05h ; color purple (05)            29/12/2021 changed***
     mov cx,230d ;initial position (for reg Ax)
         mov dx,72d 
     cote1_reg_BP_2:int 10h
           inc cx
-          cmp cx,275d
+          cmp cx,270d
           jnz cote1_reg_BP_2
     
     cote2_reg_BP_2: int 10h
@@ -1572,19 +1666,315 @@ jnz loop92
 ;///////////////////////////////////////ky
 print_registers_names proc
 ;print names of regs. of both players 1 and 2
-;TO DO K.Y
+;register plyaer 1
+       mov ah,2h ;
+              mov bx,0h  
+              mov dx,0200h
+              mov di,dx
+              int 10h
+       ;print Register AX
+       mov ah, 9
+       lea dx,registers_names
+       int 21h
+       
+       call print_sameX_incY
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print register BX
+       mov ah, 9
+       lea dx,registers_names+3
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print register CX
+       mov ah, 9
+       lea dx,registers_names+6
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       call print_sameX_incY
+       
+       ;print register DX
+       mov ah, 9
+       lea dx,registers_names+9
+       int 21h
 
+;print si...player 1
+       mov ah,2h ;
+              mov bx,0h  
+              mov dx,34c6h
+              mov di,dx
+              int 10h
+       ;print Register si
+       mov ah, 9
+       lea dx,registers_names+12
+       int 21h
+       
+       call print_sameX_incY
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print register di
+       mov ah, 9
+       lea dx,registers_names+15
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print register sp
+       mov ah, 9
+       lea dx,registers_names+18
+       int 21h
+       
+       call print_sameX_incY
+       call print_sameX_incY
+       
+       ;print register bp
+       mov ah, 9
+       lea dx,registers_names+21
+       int 21h
+;register plyaer 2
+       mov ah,2h ;
+              mov bx,0h  
+              mov dx,0215h
+              mov di,dx
+              int 10h
+       ;print Register AX
+       mov ah, 9
+       lea dx,registers_names
+       int 21h
+       
+       call print_sameX_incY
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print register BX
+       mov ah, 9
+       lea dx,registers_names+3
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print register CX
+       mov ah, 9
+       lea dx,registers_names+6
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print register DX
+       mov ah, 9
+       lea dx,registers_names+9
+       int 21h
+;print si...player 2
+       mov ah,2h ;
+              mov bx,0h  
+              mov dx,0222h;34dah
+              mov di,dx
+              int 10h
+       ;print Register SI
+       mov ah, 9
+       lea dx,registers_names+12
+       int 21h
+       
+       call print_sameX_incY
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print register DI
+       mov ah, 9
+       lea dx,registers_names+15
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print register SP
+       mov ah, 9
+       lea dx,registers_names+18
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       call print_sameX_incY
+       
+       ;print register BP
+       mov ah, 9
+       lea dx,registers_names+21
+       int 21h
 ret
 print_registers_names endp
 
 ;///////////////////////////////////////ky
 print_memory_names proc
-;print names of memory of both players 1 and 2
-;TO DO K.Y
+;print names of memory of both players 1 and 2 ////done 29/12/2021 ky
 
-ret
-print_memory_names endp
+;memory plyaer 1
+       mov ah,2h ;
+              mov bx,0h  
+              mov dx,0113h
+              mov di,dx
+              int 10h
+       ;print location (location name 0)
+       mov ah, 9
+       lea dx,memory_locations_names
+       int 21h
+       
+       call print_sameX_incY
+       call print_sameX_incY
 
+       ;print location (location name 1)
+       mov ah, 9
+       lea dx,memory_locations_names+2
+       int 21h
+
+        call print_sameX_incY
+       call print_sameX_incY
+
+       ;print location (location name 2)
+       mov ah, 9
+       lea dx,memory_locations_names+4
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print location (location name 3)
+       mov ah, 9
+       lea dx,memory_locations_names+6
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+
+       ;print location (location name 4)
+       mov ah, 9
+       lea dx,memory_locations_names+8
+       int 21h
+
+        call print_sameX_incY
+       call print_sameX_incY
+       
+       ;print location (location name 5)
+       mov ah, 9
+       lea dx,memory_locations_names+10
+       int 21h       
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print location (location name 6)
+       mov ah, 9
+       lea dx,memory_locations_names+12
+       int 21h
+
+       call print_sameX_incY
+       call print_sameX_incY
+
+       ;print location (location name 7)
+       mov ah, 9
+       lea dx,memory_locations_names+14
+       int 21h
+
+        call print_sameX_incY
+       call print_sameX_incY
+       
+       ;print location (location name 8)
+       mov ah, 9
+       lea dx,memory_locations_names+16
+       int 21h       
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print location (location name 9)
+       mov ah, 9
+       lea dx,memory_locations_names+18
+       int 21h
+
+       call print_sameX_incY
+       call print_sameX_incY
+
+       ;print location (location name A)
+       mov ah, 9
+       lea dx,memory_locations_names+20
+       int 21h
+;memory player 2  
+       mov ah,2h ;
+              mov bx,0h  
+              mov dx,0127h
+              mov di,dx
+              int 10h
+            
+       ;print location (location name 0)
+       mov ah, 9
+       lea dx,memory_locations_names
+       int 21h
+
+       call print_sameX_incY
+       call print_sameX_incY
+
+       ;print location (location name 1)
+       mov ah, 9
+       lea dx,memory_locations_names+2
+       int 21h
+
+        call print_sameX_incY
+       call print_sameX_incY
+
+       ;print location (location name 2)
+       mov ah, 9
+       lea dx,memory_locations_names+4
+       int 21h
+       call print_sameX_incY
+       call print_sameX_incY
+       ;print location (location name 3)
+       mov ah, 9
+       lea dx,memory_locations_names+6
+       int 21h
+
+       call print_sameX_incY
+       call print_sameX_incY
+
+       ;print location (location name 4)
+       mov ah, 9
+       lea dx,memory_locations_names+8
+       int 21h
+
+        call print_sameX_incY
+       call print_sameX_incY
+       
+       ;print location (location name 5)
+       mov ah, 9
+       lea dx,memory_locations_names+10
+       int 21h      
+       call print_sameX_incY
+       call print_sameX_incY 
+       ;print location (location name 6)
+       mov ah, 9
+       lea dx,memory_locations_names+12
+       int 21h
+
+       call print_sameX_incY
+       call print_sameX_incY
+
+       ;print location (location name 7)
+       mov ah, 9
+       lea dx,memory_locations_names+14
+       int 21h
+
+        call print_sameX_incY
+       call print_sameX_incY
+       
+       ;print location (location name 8)
+       mov ah, 9
+       lea dx,memory_locations_names+16
+       int 21h     
+       call print_sameX_incY
+       call print_sameX_incY  
+       ;print location (location name 9)
+       mov ah, 9
+       lea dx,memory_locations_names+18
+       int 21h
+  
+       call print_sameX_incY
+       call print_sameX_incY
+
+       ;print location (location name A)
+       mov ah, 9
+       lea dx,memory_locations_names+20
+       int 21h
+      ret
+       print_memory_names endp
+
+
+ 
 ;///////////////////////////////////////ky
  update_players_registers_values proc
 ;update values of registers of both players 1 and 2
@@ -1592,61 +1982,1303 @@ print_memory_names endp
        ;to print just first 4 digits replace the fifth by 0DH equivalent to 'Enter' key ascii
        mov al,0Dh 
        mov reg_Ax_1+6,al
-       mov al,0Dh 
        mov reg_Bx_1+6,al
-       mov al,0Dh 
        mov reg_Cx_1+6,al
-       mov al,0Dh 
        mov reg_Dx_1+6,al
-       mov al,0Dh 
        mov reg_Ax_2+6,al
-       mov al,0Dh 
        mov reg_Bx_2+6,al
-       mov al,0Dh 
        mov reg_Cx_2+6,al
-       mov al,0Dh 
        mov reg_Dx_2+6,al
-       mov al,0Dh 
        mov reg_SI_1+6,al
-       mov al,0Dh 
        mov reg_DI_1+6,al
-       mov al,0Dh 
        mov reg_SP_1+6,al
-       mov al,0Dh 
        mov reg_BP_1+6,al
-       mov al,0Dh 
        mov reg_SI_2+6,al
-       mov al,0Dh 
        mov reg_DI_2+6,al
-       mov al,0Dh 
        mov reg_SP_2+6,al
-       mov al,0Dh 
        mov reg_BP_2+6,al
-;assign the value of first byte of reg Ax to the var 'reg_Ax_1' (this var is for output)     
-mov cx,real_reg_Ax_1 ;assume Ax_1= 12f5 h
-mov ah,00h
-mov al,ch ;higher part of reg Ax_1  --> 12h
-mov dl,10h
-div dl
-check_hexa_digit_letter_1:
-;complete***** k.y
-add al,30h            ;to transform it into ascii
-mov reg_Ax_1+2,al     ; al=31h --> =1d
-add ah,30h            ;to transform it into ascii
-mov reg_Ax_1+3,ah     ;ah=32h --> =2d
 
-mov ah,00h
-mov al,cl ;lower part of reg Ax_1  --> f5h
-mov dl,10h
-div dl
-add al,30h            ;to transform it into ascii
-mov reg_Ax_1+4,al     ; al=31h --> =1d
-add ah,30h            ;to transform it into ascii
-mov reg_Ax_1+5,ah     ;ah=35h --> =5d
+ ;***** k.y**************************************make macro if u want later k.y
+;checkthe entries of real_reg_Ax_1 are digits or letters
+check_reg_Ax_1_hexa_is_digit_or_letter_1: mov cx,real_reg_Ax_1 
+                               mov ah,00h
+                               mov al,ch ;higher part of reg Ax_1  --> 12h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=1 ah=2
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_reg_Ax_1_1
+                               jmp reg_Ax_1_hexa_is_letter_1
 
+                               check_upper_bound_value_reg_Ax_1_1:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe reg_Ax_1_hexa_is_digit_1
+                                                               jmp reg_Ax_1_hexa_is_letter_1
+                               reg_Ax_1_hexa_is_digit_1:add al,30h            ;to transform it into ascii
+                                                 mov reg_Ax_1+2,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Ax_1_hexa_is_digit_or_letter_2
+                               reg_Ax_1_hexa_is_letter_1:sub al,9d
+                                                 add al,60h
+                                                 mov reg_Ax_1+2,al 
+                                                 jmp check_reg_Ax_1_hexa_is_digit_or_letter_2
+check_reg_Ax_1_hexa_is_digit_or_letter_2: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_reg_Ax_1_2
+                               jmp reg_Ax_1_hexa_is_letter_2
 
+                               check_upper_bound_value_reg_Ax_1_2:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe reg_Ax_1_hexa_is_digit_2
+                                                               jmp reg_Ax_1_hexa_is_letter_2
+                               reg_Ax_1_hexa_is_digit_2:add ah,30h            ;to transform it into ascii
+                                                 mov reg_Ax_1+3,ah     ; ah=32h --> =2d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Ax_1_hexa_is_digit_or_letter_3
+                               reg_Ax_1_hexa_is_letter_2:sub ah,9d
+                                                 add ah,60h
+                                                 mov reg_Ax_1+3,ah 
+                                                 jmp check_reg_Ax_1_hexa_is_digit_or_letter_3
+check_reg_Ax_1_hexa_is_digit_or_letter_3:;cl contain the lower part of reg ax_1
+                               mov ah,00h
+                               mov al,cl ;lower part of reg Ax_1  --> f5h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=f ah=5
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_reg_Ax_1_3
+                               jmp reg_Ax_1_hexa_is_letter_3
 
+                               check_upper_bound_value_reg_Ax_1_3:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe reg_Ax_1_hexa_is_digit_3
+                                                               jmp reg_Ax_1_hexa_is_letter_3
+                               reg_Ax_1_hexa_is_digit_3:add al,30h            ;to transform it into ascii
+                                                 mov reg_Ax_1+4,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Ax_1_hexa_is_digit_or_letter_4
+                               reg_Ax_1_hexa_is_letter_3:sub al,9d
+                                                 add al,60h
+                                                 mov reg_Ax_1+4,al 
+                                                 jmp check_reg_Ax_1_hexa_is_digit_or_letter_4
+check_reg_Ax_1_hexa_is_digit_or_letter_4: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_reg_Ax_1_4
+                               jmp reg_Ax_1_hexa_is_letter_4
 
+                               check_upper_bound_value_reg_Ax_1_4:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe reg_Ax_1_hexa_is_digit_4
+                                                               jmp reg_Ax_1_hexa_is_letter_4
+                               reg_Ax_1_hexa_is_digit_4:add ah,30h            ;to transform it into ascii
+                                                 mov reg_Ax_1+5,ah     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp finished_reg_Ax_1_hexa_is_digit_or_letter
+                               reg_Ax_1_hexa_is_letter_4:sub ah,9d
+                                                 add ah,60h
+                                                 mov reg_Ax_1+5,ah 
+                                                 jmp finished_reg_Ax_1_hexa_is_digit_or_letter
+                               finished_reg_Ax_1_hexa_is_digit_or_letter:   
+ ;checkthe entries of real_reg_Ax_2 are digits or letters
+check_reg_Ax_2_hexa_is_digit_or_letter_1: mov cx,real_reg_Ax_2 
+                               mov ah,00h
+                               mov al,ch ;higher part of reg Ax_1  --> 12h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=1 ah=2
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_reg_Ax_2_1
+                               jmp reg_Ax_2_hexa_is_letter_1
+
+                               check_upper_bound_value_reg_Ax_2_1:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe reg_Ax_2_hexa_is_digit_1
+                                                               jmp reg_Ax_2_hexa_is_letter_1
+                               reg_Ax_2_hexa_is_digit_1:add al,30h            ;to transform it into ascii
+                                                 mov reg_Ax_2+2,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Ax_2_hexa_is_digit_or_letter_2
+                               reg_Ax_2_hexa_is_letter_1:sub al,9d
+                                                 add al,60h
+                                                 mov reg_Ax_2+2,al 
+                                                 jmp check_reg_Ax_2_hexa_is_digit_or_letter_2
+check_reg_Ax_2_hexa_is_digit_or_letter_2: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_reg_Ax_2_2
+                               jmp reg_Ax_2_hexa_is_letter_2
+
+                               check_upper_bound_value_reg_Ax_2_2:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe reg_Ax_2_hexa_is_digit_2
+                                                               jmp reg_Ax_2_hexa_is_letter_2
+                               reg_Ax_2_hexa_is_digit_2:add ah,30h            ;to transform it into ascii
+                                                 mov reg_Ax_2+3,ah     ; ah=32h --> =2d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Ax_2_hexa_is_digit_or_letter_3
+                               reg_Ax_2_hexa_is_letter_2:sub ah,9d
+                                                 add ah,60h
+                                                 mov reg_Ax_2+3,ah 
+                                                 jmp check_reg_Ax_2_hexa_is_digit_or_letter_3
+check_reg_Ax_2_hexa_is_digit_or_letter_3:;cl contain the lower part of reg ax_1
+                               mov ah,00h
+                               mov al,cl ;lower part of reg Ax_1  --> f5h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=f ah=5
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_reg_Ax_2_3
+                               jmp reg_Ax_2_hexa_is_letter_3
+
+                               check_upper_bound_value_reg_Ax_2_3:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe reg_Ax_2_hexa_is_digit_3
+                                                               jmp reg_Ax_2_hexa_is_letter_3
+                               reg_Ax_2_hexa_is_digit_3:add al,30h            ;to transform it into ascii
+                                                 mov reg_Ax_2+4,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Ax_2_hexa_is_digit_or_letter_4
+                               reg_Ax_2_hexa_is_letter_3:sub al,9d
+                                                 add al,60h
+                                                 mov reg_Ax_2+4,al 
+                                                 jmp check_reg_Ax_2_hexa_is_digit_or_letter_4
+check_reg_Ax_2_hexa_is_digit_or_letter_4: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_reg_Ax_2_4
+                               jmp reg_Ax_2_hexa_is_letter_4
+
+                               check_upper_bound_value_reg_Ax_2_4:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe reg_Ax_2_hexa_is_digit_4
+                                                               jmp reg_Ax_2_hexa_is_letter_4
+                               reg_Ax_2_hexa_is_digit_4:add ah,30h            ;to transform it into ascii
+                                                 mov reg_Ax_2+5,ah     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp finished_reg_Ax_2_hexa_is_digit_or_letter
+                               reg_Ax_2_hexa_is_letter_4:sub ah,9d
+                                                 add ah,60h
+                                                 mov reg_Ax_2+5,ah 
+                                                 jmp finished_reg_Ax_2_hexa_is_digit_or_letter
+                               finished_reg_Ax_2_hexa_is_digit_or_letter:                                      
+;checkthe entries of real_reg_Ax_1 are digits or letters
+check_reg_Bx_1_hexa_is_digit_or_letter_1: mov cx,real_reg_Bx_1 
+                               mov ah,00h
+                               mov al,ch ;higher part of reg Ax_1  --> 12h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=1 ah=2
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_reg_Bx_1_1
+                               jmp reg_Bx_1_hexa_is_letter_1
+
+                               check_upper_bound_value_reg_Bx_1_1:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe reg_Bx_1_hexa_is_digit_1
+                                                               jmp reg_Bx_1_hexa_is_letter_1
+                               reg_Bx_1_hexa_is_digit_1:add al,30h            ;to transform it into ascii
+                                                 mov reg_Bx_1+2,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Bx_1_hexa_is_digit_or_letter_2
+                               reg_Bx_1_hexa_is_letter_1:sub al,9d
+                                                 add al,60h
+                                                 mov reg_Bx_1+2,al 
+                                                 jmp check_reg_Bx_1_hexa_is_digit_or_letter_2
+check_reg_Bx_1_hexa_is_digit_or_letter_2: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_reg_Bx_1_2
+                               jmp reg_Bx_1_hexa_is_letter_2
+
+                               check_upper_bound_value_reg_Bx_1_2:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe reg_Bx_1_hexa_is_digit_2
+                                                               jmp reg_Bx_1_hexa_is_letter_2
+                               reg_Bx_1_hexa_is_digit_2:add ah,30h            ;to transform it into ascii
+                                                 mov reg_Bx_1+3,ah     ; ah=32h --> =2d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Bx_1_hexa_is_digit_or_letter_3
+                               reg_Bx_1_hexa_is_letter_2:sub ah,9d
+                                                 add ah,60h
+                                                 mov reg_Bx_1+3,ah 
+                                                 jmp check_reg_Bx_1_hexa_is_digit_or_letter_3
+check_reg_Bx_1_hexa_is_digit_or_letter_3:;cl contain the lower part of reg ax_1
+                               mov ah,00h
+                               mov al,cl ;lower part of reg Ax_1  --> f5h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=f ah=5
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_reg_Bx_1_3
+                               jmp reg_Bx_1_hexa_is_letter_3
+
+                               check_upper_bound_value_reg_Bx_1_3:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe reg_Bx_1_hexa_is_digit_3
+                                                               jmp reg_Bx_1_hexa_is_letter_3
+                               reg_Bx_1_hexa_is_digit_3:add al,30h            ;to transform it into ascii
+                                                 mov reg_Bx_1+4,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Bx_1_hexa_is_digit_or_letter_4
+                               reg_Bx_1_hexa_is_letter_3:sub al,9d
+                                                 add al,60h
+                                                 mov reg_Bx_1+4,al 
+                                                 jmp check_reg_Bx_1_hexa_is_digit_or_letter_4
+check_reg_Bx_1_hexa_is_digit_or_letter_4: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_reg_Bx_1_4
+                               jmp reg_Bx_1_hexa_is_letter_4
+
+                               check_upper_bound_value_reg_Bx_1_4:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe reg_Bx_1_hexa_is_digit_4
+                                                               jmp reg_Bx_1_hexa_is_letter_4
+                               reg_Bx_1_hexa_is_digit_4:add ah,30h            ;to transform it into ascii
+                                                 mov reg_Bx_1+5,ah     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp finished_reg_Bx_1_hexa_is_digit_or_letter
+                               reg_Bx_1_hexa_is_letter_4:sub ah,9d
+                                                 add ah,60h
+                                                 mov reg_Bx_1+5,ah 
+                                                 jmp finished_reg_Bx_1_hexa_is_digit_or_letter
+                               finished_reg_Bx_1_hexa_is_digit_or_letter:   
+ ;checkthe entries of real_reg_Ax_2 are digits or letters
+check_reg_Bx_2_hexa_is_digit_or_letter_1: mov cx,real_reg_Bx_2 
+                               mov ah,00h
+                               mov al,ch ;higher part of reg Ax_1  --> 12h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=1 ah=2
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_reg_Bx_2_1
+                               jmp reg_Bx_2_hexa_is_letter_1
+
+                               check_upper_bound_value_reg_Bx_2_1:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe reg_Bx_2_hexa_is_digit_1
+                                                               jmp reg_Bx_2_hexa_is_letter_1
+                               reg_Bx_2_hexa_is_digit_1:add al,30h            ;to transform it into ascii
+                                                 mov reg_Bx_2+2,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Bx_2_hexa_is_digit_or_letter_2
+                               reg_Bx_2_hexa_is_letter_1:sub al,9d
+                                                 add al,60h
+                                                 mov reg_Bx_2+2,al 
+                                                 jmp check_reg_Bx_2_hexa_is_digit_or_letter_2
+check_reg_Bx_2_hexa_is_digit_or_letter_2: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_reg_Bx_2_2
+                               jmp reg_Bx_2_hexa_is_letter_2
+
+                               check_upper_bound_value_reg_Bx_2_2:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe reg_Bx_2_hexa_is_digit_2
+                                                               jmp reg_Bx_2_hexa_is_letter_2
+                               reg_Bx_2_hexa_is_digit_2:add ah,30h            ;to transform it into ascii
+                                                 mov reg_Bx_2+3,ah     ; ah=32h --> =2d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Bx_2_hexa_is_digit_or_letter_3
+                               reg_Bx_2_hexa_is_letter_2:sub ah,9d
+                                                 add ah,60h
+                                                 mov reg_Bx_2+3,ah 
+                                                 jmp check_reg_Bx_2_hexa_is_digit_or_letter_3
+check_reg_Bx_2_hexa_is_digit_or_letter_3:;cl contain the lower part of reg ax_1
+                               mov ah,00h
+                               mov al,cl ;lower part of reg Ax_1  --> f5h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=f ah=5
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_reg_Bx_2_3
+                               jmp reg_Bx_2_hexa_is_letter_3
+
+                               check_upper_bound_value_reg_Bx_2_3:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe reg_Bx_2_hexa_is_digit_3
+                                                               jmp reg_Bx_2_hexa_is_letter_3
+                               reg_Bx_2_hexa_is_digit_3:add al,30h            ;to transform it into ascii
+                                                 mov reg_Bx_2+4,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_reg_Bx_2_hexa_is_digit_or_letter_4
+                               reg_Bx_2_hexa_is_letter_3:sub al,9d
+                                                 add al,60h
+                                                 mov reg_Bx_2+4,al 
+                                                 jmp check_reg_Bx_2_hexa_is_digit_or_letter_4
+check_reg_Bx_2_hexa_is_digit_or_letter_4: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_reg_Bx_2_4
+                               jmp reg_Bx_2_hexa_is_letter_4
+
+                               check_upper_bound_value_reg_Bx_2_4:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe reg_Bx_2_hexa_is_digit_4
+                                                               jmp reg_Bx_2_hexa_is_letter_4
+                               reg_Bx_2_hexa_is_digit_4:add ah,30h            ;to transform it into ascii
+                                                 mov reg_Bx_2+5,ah     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp finished_reg_Bx_2_hexa_is_digit_or_letter
+                               reg_Bx_2_hexa_is_letter_4:sub ah,9d
+                                                 add ah,60h
+                                                 mov reg_Bx_2+5,ah 
+                                                 jmp finished_reg_Bx_2_hexa_is_digit_or_letter
+                               finished_reg_Bx_2_hexa_is_digit_or_letter:
+; checkthe entries of real_reg_Cx_1 are digits or letters
+check_reg_Cx_1_hexa_is_digit_or_letter_1 : mov cx, real_reg_Cx_1
+mov ah, 00h
+mov al, ch; higher part of reg Cx_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_Cx_1_1
+jmp reg_Cx_1_hexa_is_letter_1
+
+check_upper_bound_value_reg_Cx_1_1 : mov bl, 9d
+cmp al, bl
+jbe reg_Cx_1_hexa_is_digit_1
+jmp reg_Cx_1_hexa_is_letter_1
+reg_Cx_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov reg_Cx_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp check_reg_Cx_1_hexa_is_digit_or_letter_2
+reg_Cx_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov reg_Cx_1 + 2, al
+jmp check_reg_Cx_1_hexa_is_digit_or_letter_2
+check_reg_Cx_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_Cx_1_2
+jmp reg_Cx_1_hexa_is_letter_2
+
+check_upper_bound_value_reg_Cx_1_2 : mov bl, 9d
+cmp ah, bl
+jbe reg_Cx_1_hexa_is_digit_2
+jmp reg_Cx_1_hexa_is_letter_2
+reg_Cx_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov reg_Cx_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Cx_1
+jmp check_reg_Cx_1_hexa_is_digit_or_letter_3
+reg_Cx_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov reg_Cx_1 + 3, ah
+jmp check_reg_Cx_1_hexa_is_digit_or_letter_3
+check_reg_Cx_1_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg Cx_1
+mov ah, 00h
+mov al, cl; lower part of reg Cx_1-- > f5h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = f ah = 5
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_Cx_1_3
+jmp reg_Cx_1_hexa_is_letter_3
+
+check_upper_bound_value_reg_Cx_1_3 : mov bl, 9d
+cmp al, bl
+jbe reg_Cx_1_hexa_is_digit_3
+jmp reg_Cx_1_hexa_is_letter_3
+reg_Cx_1_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+mov reg_Cx_1 + 4, al; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp check_reg_Cx_1_hexa_is_digit_or_letter_4
+reg_Cx_1_hexa_is_letter_3 : sub al, 9d
+add al, 60h
+mov reg_Cx_1 + 4, al
+jmp check_reg_Cx_1_hexa_is_digit_or_letter_4
+check_reg_Cx_1_hexa_is_digit_or_letter_4 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_Cx_1_4
+jmp reg_Cx_1_hexa_is_letter_4
+
+check_upper_bound_value_reg_Cx_1_4 : mov bl, 9d
+cmp ah, bl
+jbe reg_Cx_1_hexa_is_digit_4
+jmp reg_Cx_1_hexa_is_letter_4
+reg_Cx_1_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+mov reg_Cx_1 + 5, ah; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp finished_reg_Cx_1_hexa_is_digit_or_letter
+reg_Cx_1_hexa_is_letter_4 : sub ah, 9d
+add ah, 60h
+mov reg_Cx_1 + 5, ah
+jmp finished_reg_Cx_1_hexa_is_digit_or_letter
+finished_reg_Cx_1_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_Cx_2 are digits or letters
+check_reg_Cx_2_hexa_is_digit_or_letter_1 : mov cx, real_reg_Cx_2
+mov ah, 00h
+mov al, ch; higher part of reg Cx_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_Cx_2_1
+jmp reg_Cx_2_hexa_is_letter_1
+
+check_upper_bound_value_reg_Cx_2_1 : mov bl, 9d
+cmp al, bl
+jbe reg_Cx_2_hexa_is_digit_1
+jmp reg_Cx_2_hexa_is_letter_1
+reg_Cx_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov reg_Cx_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp check_reg_Cx_2_hexa_is_digit_or_letter_2
+reg_Cx_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov reg_Cx_2 + 2, al
+jmp check_reg_Cx_2_hexa_is_digit_or_letter_2
+check_reg_Cx_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_Cx_2_2
+jmp reg_Cx_2_hexa_is_letter_2
+
+check_upper_bound_value_reg_Cx_2_2 : mov bl, 9d
+cmp ah, bl
+jbe reg_Cx_2_hexa_is_digit_2
+jmp reg_Cx_2_hexa_is_letter_2
+reg_Cx_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov reg_Cx_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Cx_1
+jmp check_reg_Cx_2_hexa_is_digit_or_letter_3
+reg_Cx_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov reg_Cx_2 + 3, ah
+jmp check_reg_Cx_2_hexa_is_digit_or_letter_3
+check_reg_Cx_2_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg Cx_1
+mov ah, 00h
+mov al, cl; lower part of reg Cx_1-- > f5h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = f ah = 5
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_Cx_2_3
+jmp reg_Cx_2_hexa_is_letter_3
+
+check_upper_bound_value_reg_Cx_2_3 : mov bl, 9d
+cmp al, bl
+jbe reg_Cx_2_hexa_is_digit_3
+jmp reg_Cx_2_hexa_is_letter_3
+reg_Cx_2_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+mov reg_Cx_2 + 4, al; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp check_reg_Cx_2_hexa_is_digit_or_letter_4
+reg_Cx_2_hexa_is_letter_3 : sub al, 9d
+add al, 60h
+mov reg_Cx_2 + 4, al
+jmp check_reg_Cx_2_hexa_is_digit_or_letter_4
+check_reg_Cx_2_hexa_is_digit_or_letter_4 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_Cx_2_4
+jmp reg_Cx_2_hexa_is_letter_4
+
+check_upper_bound_value_reg_Cx_2_4 : mov bl, 9d
+cmp ah, bl
+jbe reg_Cx_2_hexa_is_digit_4
+jmp reg_Cx_2_hexa_is_letter_4
+reg_Cx_2_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+mov reg_Cx_2 + 5, ah; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp finished_reg_Cx_2_hexa_is_digit_or_letter
+reg_Cx_2_hexa_is_letter_4 : sub ah, 9d
+add ah, 60h
+mov reg_Cx_2 + 5, ah
+jmp finished_reg_Cx_2_hexa_is_digit_or_letter
+finished_reg_Cx_2_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_Cx_1 are digits or letters
+check_reg_Dx_1_hexa_is_digit_or_letter_1 : mov cx, real_reg_Dx_1
+mov ah, 00h
+mov al, ch; higher part of reg Cx_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_Dx_1_1
+jmp reg_Dx_1_hexa_is_letter_1
+
+check_upper_bound_value_reg_Dx_1_1 : mov bl, 9d
+cmp al, bl
+jbe reg_Dx_1_hexa_is_digit_1
+jmp reg_Dx_1_hexa_is_letter_1
+reg_Dx_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov reg_Dx_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp check_reg_Dx_1_hexa_is_digit_or_letter_2
+reg_Dx_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov reg_Dx_1 + 2, al
+jmp check_reg_Dx_1_hexa_is_digit_or_letter_2
+check_reg_Dx_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_Dx_1_2
+jmp reg_Dx_1_hexa_is_letter_2
+
+check_upper_bound_value_reg_Dx_1_2 : mov bl, 9d
+cmp ah, bl
+jbe reg_Dx_1_hexa_is_digit_2
+jmp reg_Dx_1_hexa_is_letter_2
+reg_Dx_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov reg_Dx_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Cx_1
+jmp check_reg_Dx_1_hexa_is_digit_or_letter_3
+reg_Dx_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov reg_Dx_1 + 3, ah
+jmp check_reg_Dx_1_hexa_is_digit_or_letter_3
+check_reg_Dx_1_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg Cx_1
+mov ah, 00h
+mov al, cl; lower part of reg Cx_1-- > f5h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = f ah = 5
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_Dx_1_3
+jmp reg_Dx_1_hexa_is_letter_3
+
+check_upper_bound_value_reg_Dx_1_3 : mov bl, 9d
+cmp al, bl
+jbe reg_Dx_1_hexa_is_digit_3
+jmp reg_Dx_1_hexa_is_letter_3
+reg_Dx_1_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+mov reg_Dx_1 + 4, al; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp check_reg_Dx_1_hexa_is_digit_or_letter_4
+reg_Dx_1_hexa_is_letter_3 : sub al, 9d
+add al, 60h
+mov reg_Dx_1 + 4, al
+jmp check_reg_Dx_1_hexa_is_digit_or_letter_4
+check_reg_Dx_1_hexa_is_digit_or_letter_4 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_Dx_1_4
+jmp reg_Dx_1_hexa_is_letter_4
+
+check_upper_bound_value_reg_Dx_1_4 : mov bl, 9d
+cmp ah, bl
+jbe reg_Dx_1_hexa_is_digit_4
+jmp reg_Dx_1_hexa_is_letter_4
+reg_Dx_1_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+mov reg_Dx_1 + 5, ah; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp finished_reg_Dx_1_hexa_is_digit_or_letter
+reg_Dx_1_hexa_is_letter_4 : sub ah, 9d
+add ah, 60h
+mov reg_Dx_1 + 5, ah
+jmp finished_reg_Dx_1_hexa_is_digit_or_letter
+finished_reg_Dx_1_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_Cx_2 are digits or letters
+check_reg_Dx_2_hexa_is_digit_or_letter_1 : mov cx, real_reg_Dx_2
+mov ah, 00h
+mov al, ch; higher part of reg Cx_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_Dx_2_1
+jmp reg_Dx_2_hexa_is_letter_1
+
+check_upper_bound_value_reg_Dx_2_1 : mov bl, 9d
+cmp al, bl
+jbe reg_Dx_2_hexa_is_digit_1
+jmp reg_Dx_2_hexa_is_letter_1
+reg_Dx_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov reg_Dx_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp check_reg_Dx_2_hexa_is_digit_or_letter_2
+reg_Dx_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov reg_Dx_2 + 2, al
+jmp check_reg_Dx_2_hexa_is_digit_or_letter_2
+check_reg_Dx_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_Dx_2_2
+jmp reg_Dx_2_hexa_is_letter_2
+
+check_upper_bound_value_reg_Dx_2_2 : mov bl, 9d
+cmp ah, bl
+jbe reg_Dx_2_hexa_is_digit_2
+jmp reg_Dx_2_hexa_is_letter_2
+reg_Dx_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov reg_Dx_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Cx_1
+jmp check_reg_Dx_2_hexa_is_digit_or_letter_3
+reg_Dx_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov reg_Dx_2 + 3, ah
+jmp check_reg_Dx_2_hexa_is_digit_or_letter_3
+check_reg_Dx_2_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg Cx_1
+mov ah, 00h
+mov al, cl; lower part of reg Cx_1-- > f5h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = f ah = 5
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_Dx_2_3
+jmp reg_Dx_2_hexa_is_letter_3
+
+check_upper_bound_value_reg_Dx_2_3 : mov bl, 9d
+cmp al, bl
+jbe reg_Dx_2_hexa_is_digit_3
+jmp reg_Dx_2_hexa_is_letter_3
+reg_Dx_2_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+mov reg_Dx_2 + 4, al; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp check_reg_Dx_2_hexa_is_digit_or_letter_4
+reg_Dx_2_hexa_is_letter_3 : sub al, 9d
+add al, 60h
+mov reg_Dx_2 + 4, al
+jmp check_reg_Dx_2_hexa_is_digit_or_letter_4
+check_reg_Dx_2_hexa_is_digit_or_letter_4 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_Dx_2_4
+jmp reg_Dx_2_hexa_is_letter_4
+
+check_upper_bound_value_reg_Dx_2_4 : mov bl, 9d
+cmp ah, bl
+jbe reg_Dx_2_hexa_is_digit_4
+jmp reg_Dx_2_hexa_is_letter_4
+reg_Dx_2_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+mov reg_Dx_2 + 5, ah; al = 31h-- > = 1d; put directly into reg_Cx_1
+jmp finished_reg_Dx_2_hexa_is_digit_or_letter
+reg_Dx_2_hexa_is_letter_4 : sub ah, 9d
+add ah, 60h
+mov reg_Dx_2 + 5, ah
+jmp finished_reg_Dx_2_hexa_is_digit_or_letter
+finished_reg_Dx_2_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_SI_1 are digits or letters
+check_reg_SI_1_hexa_is_digit_or_letter_1 : mov cx, real_reg_SI_1
+mov ah, 00h
+mov al, ch; higher part of reg SI_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_SI_1_1
+jmp reg_SI_1_hexa_is_letter_1
+
+check_upper_bound_value_reg_SI_1_1 : mov bl, 9d
+cmp al, bl
+jbe reg_SI_1_hexa_is_digit_1
+jmp reg_SI_1_hexa_is_letter_1
+reg_SI_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov reg_SI_1 + 2, al; al = 31h-- > = 1d; put directly into reg_SI_1
+jmp check_reg_SI_1_hexa_is_digit_or_letter_2
+reg_SI_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov reg_SI_1 + 2, al
+jmp check_reg_SI_1_hexa_is_digit_or_letter_2
+check_reg_SI_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_SI_1_2
+jmp reg_SI_1_hexa_is_letter_2
+
+check_upper_bound_value_reg_SI_1_2 : mov bl, 9d
+cmp ah, bl
+jbe reg_SI_1_hexa_is_digit_2
+jmp reg_SI_1_hexa_is_letter_2
+reg_SI_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov reg_SI_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_SI_1
+jmp check_reg_SI_1_hexa_is_digit_or_letter_3
+reg_SI_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov reg_SI_1 + 3, ah
+jmp check_reg_SI_1_hexa_is_digit_or_letter_3
+check_reg_SI_1_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg SI_1
+mov ah, 00h
+mov al, cl; lower part of reg SI_1-- > f5h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = f ah = 5
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_SI_1_3
+jmp reg_SI_1_hexa_is_letter_3
+
+check_upper_bound_value_reg_SI_1_3 : mov bl, 9d
+cmp al, bl
+jbe reg_SI_1_hexa_is_digit_3
+jmp reg_SI_1_hexa_is_letter_3
+reg_SI_1_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+mov reg_SI_1 + 4, al; al = 31h-- > = 1d; put directly into reg_SI_1
+jmp check_reg_SI_1_hexa_is_digit_or_letter_4
+reg_SI_1_hexa_is_letter_3 : sub al, 9d
+add al, 60h
+mov reg_SI_1 + 4, al
+jmp check_reg_SI_1_hexa_is_digit_or_letter_4
+check_reg_SI_1_hexa_is_digit_or_letter_4 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_SI_1_4
+jmp reg_SI_1_hexa_is_letter_4
+
+check_upper_bound_value_reg_SI_1_4 : mov bl, 9d
+cmp ah, bl
+jbe reg_SI_1_hexa_is_digit_4
+jmp reg_SI_1_hexa_is_letter_4
+reg_SI_1_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+mov reg_SI_1 + 5, ah; al = 31h-- > = 1d; put directly into reg_SI_1
+jmp finished_reg_SI_1_hexa_is_digit_or_letter
+reg_SI_1_hexa_is_letter_4 : sub ah, 9d
+add ah, 60h
+mov reg_SI_1 + 5, ah
+jmp finished_reg_SI_1_hexa_is_digit_or_letter
+finished_reg_SI_1_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_SI_2 are digits or letters
+check_reg_SI_2_hexa_is_digit_or_letter_1 : mov cx, real_reg_SI_2
+mov ah, 00h
+mov al, ch; higher part of reg SI_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_SI_2_1
+jmp reg_SI_2_hexa_is_letter_1
+
+check_upper_bound_value_reg_SI_2_1 : mov bl, 9d
+cmp al, bl
+jbe reg_SI_2_hexa_is_digit_1
+jmp reg_SI_2_hexa_is_letter_1
+reg_SI_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov reg_SI_2 + 2, al; al = 31h-- > = 1d; put directly into reg_SI_1
+jmp check_reg_SI_2_hexa_is_digit_or_letter_2
+reg_SI_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov reg_SI_2 + 2, al
+jmp check_reg_SI_2_hexa_is_digit_or_letter_2
+check_reg_SI_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_SI_2_2
+jmp reg_SI_2_hexa_is_letter_2
+
+check_upper_bound_value_reg_SI_2_2 : mov bl, 9d
+cmp ah, bl
+jbe reg_SI_2_hexa_is_digit_2
+jmp reg_SI_2_hexa_is_letter_2
+reg_SI_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov reg_SI_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_SI_1
+jmp check_reg_SI_2_hexa_is_digit_or_letter_3
+reg_SI_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov reg_SI_2 + 3, ah
+jmp check_reg_SI_2_hexa_is_digit_or_letter_3
+check_reg_SI_2_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg SI_1
+mov ah, 00h
+mov al, cl; lower part of reg SI_1-- > f5h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = f ah = 5
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_reg_SI_2_3
+jmp reg_SI_2_hexa_is_letter_3
+
+check_upper_bound_value_reg_SI_2_3 : mov bl, 9d
+cmp al, bl
+jbe reg_SI_2_hexa_is_digit_3
+jmp reg_SI_2_hexa_is_letter_3
+reg_SI_2_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+mov reg_SI_2 + 4, al; al = 31h-- > = 1d; put directly into reg_SI_1
+jmp check_reg_SI_2_hexa_is_digit_or_letter_4
+reg_SI_2_hexa_is_letter_3 : sub al, 9d
+add al, 60h
+mov reg_SI_2 + 4, al
+jmp check_reg_SI_2_hexa_is_digit_or_letter_4
+check_reg_SI_2_hexa_is_digit_or_letter_4 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_reg_SI_2_4
+jmp reg_SI_2_hexa_is_letter_4
+
+check_upper_bound_value_reg_SI_2_4 : mov bl, 9d
+cmp ah, bl
+jbe reg_SI_2_hexa_is_digit_4
+jmp reg_SI_2_hexa_is_letter_4
+reg_SI_2_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+mov reg_SI_2 + 5, ah; al = 31h-- > = 1d; put directly into reg_SI_1
+jmp finished_reg_SI_2_hexa_is_digit_or_letter
+reg_SI_2_hexa_is_letter_4 : sub ah, 9d
+add ah, 60h
+mov reg_SI_2 + 5, ah
+jmp finished_reg_SI_2_hexa_is_digit_or_letter
+finished_reg_SI_2_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_SI_1 are digits or letters
+check_reg_DI_1_hexa_is_digit_or_letter_1 : mov cx, real_reg_DI_1
+                            mov ah, 00h
+                            mov al, ch; higher part of reg SI_1-- > 12h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_DI_1_1
+                            jmp reg_DI_1_hexa_is_letter_1
+
+                            check_upper_bound_value_reg_DI_1_1 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_DI_1_hexa_is_digit_1
+                            jmp reg_DI_1_hexa_is_letter_1
+                            reg_DI_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+                            mov reg_DI_1 + 2, al; al = 31h-- > = 1d; put directly into reg_SI_1
+                            jmp check_reg_DI_1_hexa_is_digit_or_letter_2
+                            reg_DI_1_hexa_is_letter_1 : sub al, 9d
+                            add al, 60h
+                            mov reg_DI_1 + 2, al
+                            jmp check_reg_DI_1_hexa_is_digit_or_letter_2
+check_reg_DI_1_hexa_is_digit_or_letter_2 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_DI_1_2
+                            jmp reg_DI_1_hexa_is_letter_2
+
+                            check_upper_bound_value_reg_DI_1_2 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_DI_1_hexa_is_digit_2
+                            jmp reg_DI_1_hexa_is_letter_2
+                            reg_DI_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+                            mov reg_DI_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_SI_1
+                            jmp check_reg_DI_1_hexa_is_digit_or_letter_3
+                            reg_DI_1_hexa_is_letter_2 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_DI_1 + 3, ah
+                            jmp check_reg_DI_1_hexa_is_digit_or_letter_3
+check_reg_DI_1_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg SI_1
+                            mov ah, 00h
+                            mov al, cl; lower part of reg SI_1-- > f5h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = f ah = 5
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_DI_1_3
+                            jmp reg_DI_1_hexa_is_letter_3
+
+                            check_upper_bound_value_reg_DI_1_3 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_DI_1_hexa_is_digit_3
+                            jmp reg_DI_1_hexa_is_letter_3
+                            reg_DI_1_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+                            mov reg_DI_1 + 4, al; al = 31h-- > = 1d; put directly into reg_SI_1
+                            jmp check_reg_DI_1_hexa_is_digit_or_letter_4
+                            reg_DI_1_hexa_is_letter_3 : sub al, 9d
+                            add al, 60h
+                            mov reg_DI_1 + 4, al
+                            jmp check_reg_DI_1_hexa_is_digit_or_letter_4
+check_reg_DI_1_hexa_is_digit_or_letter_4 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_DI_1_4
+                            jmp reg_DI_1_hexa_is_letter_4
+
+                            check_upper_bound_value_reg_DI_1_4 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_DI_1_hexa_is_digit_4
+                            jmp reg_DI_1_hexa_is_letter_4
+                            reg_DI_1_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+                            mov reg_DI_1 + 5, ah; al = 31h-- > = 1d; put directly into reg_SI_1
+                            jmp finished_reg_DI_1_hexa_is_digit_or_letter
+                            reg_DI_1_hexa_is_letter_4 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_DI_1 + 5, ah
+                            jmp finished_reg_DI_1_hexa_is_digit_or_letter
+finished_reg_DI_1_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_SI_2 are digits or letters
+check_reg_DI_2_hexa_is_digit_or_letter_1 : mov cx, real_reg_DI_2
+                            mov ah, 00h
+                            mov al, ch; higher part of reg SI_1-- > 12h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_DI_2_1
+                            jmp reg_DI_2_hexa_is_letter_1
+
+                            check_upper_bound_value_reg_DI_2_1 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_DI_2_hexa_is_digit_1
+                            jmp reg_DI_2_hexa_is_letter_1
+                            reg_DI_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+                            mov reg_DI_2 + 2, al; al = 31h-- > = 1d; put directly into reg_SI_1
+                            jmp check_reg_DI_2_hexa_is_digit_or_letter_2
+                            reg_DI_2_hexa_is_letter_1 : sub al, 9d
+                            add al, 60h
+                            mov reg_DI_2 + 2, al
+                            jmp check_reg_DI_2_hexa_is_digit_or_letter_2
+check_reg_DI_2_hexa_is_digit_or_letter_2 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_DI_2_2
+                            jmp reg_DI_2_hexa_is_letter_2
+
+                            check_upper_bound_value_reg_DI_2_2 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_DI_2_hexa_is_digit_2
+                            jmp reg_DI_2_hexa_is_letter_2
+                            reg_DI_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+                            mov reg_DI_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_SI_1
+                            jmp check_reg_DI_2_hexa_is_digit_or_letter_3
+                            reg_DI_2_hexa_is_letter_2 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_DI_2 + 3, ah
+                            jmp check_reg_DI_2_hexa_is_digit_or_letter_3
+check_reg_DI_2_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg SI_1
+                            mov ah, 00h
+                            mov al, cl; lower part of reg SI_1-- > f5h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = f ah = 5
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_DI_2_3
+                            jmp reg_DI_2_hexa_is_letter_3
+
+                            check_upper_bound_value_reg_DI_2_3 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_DI_2_hexa_is_digit_3
+                            jmp reg_DI_2_hexa_is_letter_3
+                            reg_DI_2_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+                            mov reg_DI_2 + 4, al; al = 31h-- > = 1d; put directly into reg_SI_1
+                            jmp check_reg_DI_2_hexa_is_digit_or_letter_4
+                            reg_DI_2_hexa_is_letter_3 : sub al, 9d
+                            add al, 60h
+                            mov reg_DI_2 + 4, al
+                            jmp check_reg_DI_2_hexa_is_digit_or_letter_4
+check_reg_DI_2_hexa_is_digit_or_letter_4 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_DI_2_4
+                            jmp reg_DI_2_hexa_is_letter_4
+
+                            check_upper_bound_value_reg_DI_2_4 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_DI_2_hexa_is_digit_4
+                            jmp reg_DI_2_hexa_is_letter_4
+                            reg_DI_2_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+                            mov reg_DI_2 + 5, ah; al = 31h-- > = 1d; put directly into reg_SI_1
+                            jmp finished_reg_DI_2_hexa_is_digit_or_letter
+                            reg_DI_2_hexa_is_letter_4 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_DI_2 + 5, ah
+                            jmp finished_reg_DI_2_hexa_is_digit_or_letter
+finished_reg_DI_2_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_SP_1 are digits or letters
+check_reg_SP_1_hexa_is_digit_or_letter_1 : mov cx, real_reg_SP_1
+                            mov ah, 00h
+                            mov al, ch; higher part of reg SP_1-- > 12h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_SP_1_1
+                            jmp reg_SP_1_hexa_is_letter_1
+
+                            check_upper_bound_value_reg_SP_1_1 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_SP_1_hexa_is_digit_1
+                            jmp reg_SP_1_hexa_is_letter_1
+                            reg_SP_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+                            mov reg_SP_1 + 2, al; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp check_reg_SP_1_hexa_is_digit_or_letter_2
+                            reg_SP_1_hexa_is_letter_1 : sub al, 9d
+                            add al, 60h
+                            mov reg_SP_1 + 2, al
+                            jmp check_reg_SP_1_hexa_is_digit_or_letter_2
+check_reg_SP_1_hexa_is_digit_or_letter_2 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_SP_1_2
+                            jmp reg_SP_1_hexa_is_letter_2
+
+                            check_upper_bound_value_reg_SP_1_2 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_SP_1_hexa_is_digit_2
+                            jmp reg_SP_1_hexa_is_letter_2
+                            reg_SP_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+                            mov reg_SP_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_SP_1
+                            jmp check_reg_SP_1_hexa_is_digit_or_letter_3
+                            reg_SP_1_hexa_is_letter_2 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_SP_1 + 3, ah
+                            jmp check_reg_SP_1_hexa_is_digit_or_letter_3
+check_reg_SP_1_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg SP_1
+                            mov ah, 00h
+                            mov al, cl; lower part of reg SP_1-- > f5h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = f ah = 5
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_SP_1_3
+                            jmp reg_SP_1_hexa_is_letter_3
+
+                            check_upper_bound_value_reg_SP_1_3 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_SP_1_hexa_is_digit_3
+                            jmp reg_SP_1_hexa_is_letter_3
+                            reg_SP_1_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+                            mov reg_SP_1 + 4, al; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp check_reg_SP_1_hexa_is_digit_or_letter_4
+                            reg_SP_1_hexa_is_letter_3 : sub al, 9d
+                            add al, 60h
+                            mov reg_SP_1 + 4, al
+                            jmp check_reg_SP_1_hexa_is_digit_or_letter_4
+check_reg_SP_1_hexa_is_digit_or_letter_4 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_SP_1_4
+                            jmp reg_SP_1_hexa_is_letter_4
+
+                            check_upper_bound_value_reg_SP_1_4 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_SP_1_hexa_is_digit_4
+                            jmp reg_SP_1_hexa_is_letter_4
+                            reg_SP_1_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+                            mov reg_SP_1 + 5, ah; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp finished_reg_SP_1_hexa_is_digit_or_letter
+                            reg_SP_1_hexa_is_letter_4 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_SP_1 + 5, ah
+                            jmp finished_reg_SP_1_hexa_is_digit_or_letter
+finished_reg_SP_1_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_SP_2 are digits or letters
+check_reg_SP_2_hexa_is_digit_or_letter_1 : mov cx, real_reg_SP_2
+                            mov ah, 00h
+                            mov al, ch; higher part of reg SP_1-- > 12h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_SP_2_1
+                            jmp reg_SP_2_hexa_is_letter_1
+
+                            check_upper_bound_value_reg_SP_2_1 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_SP_2_hexa_is_digit_1
+                            jmp reg_SP_2_hexa_is_letter_1
+                            reg_SP_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+                            mov reg_SP_2 + 2, al; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp check_reg_SP_2_hexa_is_digit_or_letter_2
+                            reg_SP_2_hexa_is_letter_1 : sub al, 9d
+                            add al, 60h
+                            mov reg_SP_2 + 2, al
+                            jmp check_reg_SP_2_hexa_is_digit_or_letter_2
+check_reg_SP_2_hexa_is_digit_or_letter_2 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_SP_2_2
+                            jmp reg_SP_2_hexa_is_letter_2
+
+                            check_upper_bound_value_reg_SP_2_2 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_SP_2_hexa_is_digit_2
+                            jmp reg_SP_2_hexa_is_letter_2
+                            reg_SP_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+                            mov reg_SP_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_SP_1
+                            jmp check_reg_SP_2_hexa_is_digit_or_letter_3
+                            reg_SP_2_hexa_is_letter_2 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_SP_2 + 3, ah
+                            jmp check_reg_SP_2_hexa_is_digit_or_letter_3
+check_reg_SP_2_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg SP_1
+                            mov ah, 00h
+                            mov al, cl; lower part of reg SP_1-- > f5h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = f ah = 5
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_SP_2_3
+                            jmp reg_SP_2_hexa_is_letter_3
+
+                            check_upper_bound_value_reg_SP_2_3 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_SP_2_hexa_is_digit_3
+                            jmp reg_SP_2_hexa_is_letter_3
+                            reg_SP_2_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+                            mov reg_SP_2 + 4, al; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp check_reg_SP_2_hexa_is_digit_or_letter_4
+                            reg_SP_2_hexa_is_letter_3 : sub al, 9d
+                            add al, 60h
+                            mov reg_SP_2 + 4, al
+                            jmp check_reg_SP_2_hexa_is_digit_or_letter_4
+check_reg_SP_2_hexa_is_digit_or_letter_4 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_SP_2_4
+                            jmp reg_SP_2_hexa_is_letter_4
+
+                            check_upper_bound_value_reg_SP_2_4 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_SP_2_hexa_is_digit_4
+                            jmp reg_SP_2_hexa_is_letter_4
+                            reg_SP_2_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+                            mov reg_SP_2 + 5, ah; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp finished_reg_SP_2_hexa_is_digit_or_letter
+                            reg_SP_2_hexa_is_letter_4 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_SP_2 + 5, ah
+                            jmp finished_reg_SP_2_hexa_is_digit_or_letter
+finished_reg_SP_2_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_SP_1 are digits or letters
+check_reg_BP_1_hexa_is_digit_or_letter_1 : mov cx, real_reg_BP_1
+                            mov ah, 00h
+                            mov al, ch; higher part of reg SP_1-- > 12h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_BP_1_1
+                            jmp reg_BP_1_hexa_is_letter_1
+
+                            check_upper_bound_value_reg_BP_1_1 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_BP_1_hexa_is_digit_1
+                            jmp reg_BP_1_hexa_is_letter_1
+                            reg_BP_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+                            mov reg_BP_1 + 2, al; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp check_reg_BP_1_hexa_is_digit_or_letter_2
+                            reg_BP_1_hexa_is_letter_1 : sub al, 9d
+                            add al, 60h
+                            mov reg_BP_1 + 2, al
+                            jmp check_reg_BP_1_hexa_is_digit_or_letter_2
+check_reg_BP_1_hexa_is_digit_or_letter_2 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_BP_1_2
+                            jmp reg_BP_1_hexa_is_letter_2
+
+                            check_upper_bound_value_reg_BP_1_2 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_BP_1_hexa_is_digit_2
+                            jmp reg_BP_1_hexa_is_letter_2
+                            reg_BP_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+                            mov reg_BP_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_SP_1
+                            jmp check_reg_BP_1_hexa_is_digit_or_letter_3
+                            reg_BP_1_hexa_is_letter_2 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_BP_1 + 3, ah
+                            jmp check_reg_BP_1_hexa_is_digit_or_letter_3
+check_reg_BP_1_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg SP_1
+                            mov ah, 00h
+                            mov al, cl; lower part of reg SP_1-- > f5h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = f ah = 5
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_BP_1_3
+                            jmp reg_BP_1_hexa_is_letter_3
+
+                            check_upper_bound_value_reg_BP_1_3 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_BP_1_hexa_is_digit_3
+                            jmp reg_BP_1_hexa_is_letter_3
+                            reg_BP_1_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+                            mov reg_BP_1 + 4, al; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp check_reg_BP_1_hexa_is_digit_or_letter_4
+                            reg_BP_1_hexa_is_letter_3 : sub al, 9d
+                            add al, 60h
+                            mov reg_BP_1 + 4, al
+                            jmp check_reg_BP_1_hexa_is_digit_or_letter_4
+check_reg_BP_1_hexa_is_digit_or_letter_4 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_BP_1_4
+                            jmp reg_BP_1_hexa_is_letter_4
+
+                            check_upper_bound_value_reg_BP_1_4 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_BP_1_hexa_is_digit_4
+                            jmp reg_BP_1_hexa_is_letter_4
+                            reg_BP_1_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+                            mov reg_BP_1 + 5, ah; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp finished_reg_BP_1_hexa_is_digit_or_letter
+                            reg_BP_1_hexa_is_letter_4 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_BP_1 + 5, ah
+                            jmp finished_reg_BP_1_hexa_is_digit_or_letter
+finished_reg_BP_1_hexa_is_digit_or_letter :
+; checkthe entries of real_reg_SP_2 are digits or letters
+check_reg_BP_2_hexa_is_digit_or_letter_1 : mov cx, real_reg_BP_2
+                            mov ah, 00h
+                            mov al, ch; higher part of reg SP_1-- > 12h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_BP_2_1
+                            jmp reg_BP_2_hexa_is_letter_1
+
+                            check_upper_bound_value_reg_BP_2_1 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_BP_2_hexa_is_digit_1
+                            jmp reg_BP_2_hexa_is_letter_1
+                            reg_BP_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+                            mov reg_BP_2 + 2, al; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp check_reg_BP_2_hexa_is_digit_or_letter_2
+                            reg_BP_2_hexa_is_letter_1 : sub al, 9d
+                            add al, 60h
+                            mov reg_BP_2 + 2, al
+                            jmp check_reg_BP_2_hexa_is_digit_or_letter_2
+check_reg_BP_2_hexa_is_digit_or_letter_2 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_BP_2_2
+                            jmp reg_BP_2_hexa_is_letter_2
+
+                            check_upper_bound_value_reg_BP_2_2 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_BP_2_hexa_is_digit_2
+                            jmp reg_BP_2_hexa_is_letter_2
+                            reg_BP_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+                            mov reg_BP_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_SP_1
+                            jmp check_reg_BP_2_hexa_is_digit_or_letter_3
+                            reg_BP_2_hexa_is_letter_2 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_BP_2 + 3, ah
+                            jmp check_reg_BP_2_hexa_is_digit_or_letter_3
+check_reg_BP_2_hexa_is_digit_or_letter_3 : ; cl contain the lower part of reg SP_1
+                            mov ah, 00h
+                            mov al, cl; lower part of reg SP_1-- > f5h
+                            mov dl, 10h
+                            div dl; ans is in aland remainder in ah--->al = f ah = 5
+                            mov bl, 0d; lower range of numbers
+                            cmp al, bl
+                            jge check_upper_bound_value_reg_BP_2_3
+                            jmp reg_BP_2_hexa_is_letter_3
+
+                            check_upper_bound_value_reg_BP_2_3 : mov bl, 9d
+                            cmp al, bl
+                            jbe reg_BP_2_hexa_is_digit_3
+                            jmp reg_BP_2_hexa_is_letter_3
+                            reg_BP_2_hexa_is_digit_3 : add al, 30h; to transform it into ascii
+                            mov reg_BP_2 + 4, al; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp check_reg_BP_2_hexa_is_digit_or_letter_4
+                            reg_BP_2_hexa_is_letter_3 : sub al, 9d
+                            add al, 60h
+                            mov reg_BP_2 + 4, al
+                            jmp check_reg_BP_2_hexa_is_digit_or_letter_4
+check_reg_BP_2_hexa_is_digit_or_letter_4 :
+                            ; compare if is between range of digits or no
+                            mov bl, 0d; lower range of numbers
+                            cmp ah, bl
+                            jge check_upper_bound_value_reg_BP_2_4
+                            jmp reg_BP_2_hexa_is_letter_4
+
+                            check_upper_bound_value_reg_BP_2_4 : mov bl, 9d
+                            cmp ah, bl
+                            jbe reg_BP_2_hexa_is_digit_4
+                            jmp reg_BP_2_hexa_is_letter_4
+                            reg_BP_2_hexa_is_digit_4 : add ah, 30h; to transform it into ascii
+                            mov reg_BP_2 + 5, ah; al = 31h-- > = 1d; put directly into reg_SP_1
+                            jmp finished_reg_BP_2_hexa_is_digit_or_letter
+                            reg_BP_2_hexa_is_letter_4 : sub ah, 9d
+                            add ah, 60h
+                            mov reg_BP_2 + 5, ah
+                            jmp finished_reg_BP_2_hexa_is_digit_or_letter
+finished_reg_BP_2_hexa_is_digit_or_letter :
 ret
 update_players_registers_values endp
 
@@ -1738,7 +3370,7 @@ update_players_registers_values endp
 ;mov cursor to BP 2 reg box
        mov ah,2h ;
        mov bx,0h  
-       mov dx,2316h
+       mov dx,2315h     ;2316                              29/12/2021 changed***
        int 10h
        mov ah,9 ;print value of reg BP 2
        lea dx,reg_BP_2+2 ;//done
@@ -1772,10 +3404,10 @@ update_players_registers_values endp
        lea dx,reg_Ax_2+2 ;//done
        int 21h
 
-;mov cursor to SI 2 reg box
+;mov cursor to SI 2 reg box                           
        mov ah,2h ;
        mov bx,0h  
-       mov dx,3536h
+       mov dx,3535h                 ;3535                   29/12/2021 changed***
        int 10h
        mov ah,9 ;print value of reg SI 2
        lea dx,reg_SI_2+2 ;//DONE
@@ -1784,7 +3416,7 @@ update_players_registers_values endp
 ;mov cursor to SP 2 reg box
        mov ah,2h ;
        mov bx,0h  
-       mov dx,2116h
+       mov dx,2115h               ;2116 29/12/2021 changed***
        int 10h
        mov ah,9 ;print value of reg SP 2
        lea dx,reg_SP_2+2 ;//done
@@ -1793,7 +3425,7 @@ update_players_registers_values endp
 ;mov cursor to DI 2 reg box
        mov ah,2h ;
        mov bx,0h  
-       mov dx,3836h
+       mov dx,3835h          ;3836           ;29/12/2021 changed***
        int 10h
        mov ah,9 ;print value of reg DI 2
        lea dx,reg_DI_2+2 ;//done
@@ -1809,50 +3441,933 @@ print_register_values endp
  ;to print just first 2 digits replace the third by 0DH equivalent to 'Enter' key ascii
        mov al,0Dh 
        mov memory_0_1+4,al
-       mov al,0Dh 
        mov memory_1_1+4,al
-       mov al,0Dh 
        mov memory_2_1+4,al
-       mov al,0Dh 
        mov memory_3_1+4,al
-       mov al,0Dh 
        mov memory_4_1+4,al
-       mov al,0Dh 
        mov memory_5_1+4,al
-       mov al,0Dh 
        mov memory_6_1+4,al
-       mov al,0Dh 
        mov memory_7_1+4,al
-       mov al,0Dh 
        mov memory_8_1+4,al
-       mov al,0Dh 
        mov memory_9_1+4,al
-       mov al,0Dh 
        mov memory_A_1+4,al
-       mov al,0Dh 
        mov memory_0_2+4,al
-       mov al,0Dh 
        mov memory_1_2+4,al
-       mov al,0Dh 
        mov memory_2_2+4,al
-       mov al,0Dh 
        mov memory_3_2+4,al
-       mov al,0Dh 
        mov memory_4_2+4,al
-       mov al,0Dh 
        mov memory_5_2+4,al
-       mov al,0Dh 
        mov memory_6_2+4,al
-       mov al,0Dh 
        mov memory_7_2+4,al
-       mov al,0Dh 
        mov memory_8_2+4,al
-       mov al,0Dh 
        mov memory_9_2+4,al
-       mov al,0Dh
        mov memory_A_2+4,al
+       ;checkthe entries of real_memory_0_1 are digits or letters
+check_memory_0_1_hexa_is_digit_or_letter_1: mov ch,real_memory_0_1
+                               mov ah,00h
+                               mov al,ch ;value of memory_0_1  --> 12h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=1 ah=2
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_memory_0_1_1
+                               jmp memory_0_1_hexa_is_letter_1
 
-                     ;complete***** k.y**************************************wednesday complete from k ragab's code
+                               check_upper_bound_value_memory_0_1_1:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe memory_0_1_hexa_is_digit_1
+                                                               jmp memory_0_1_hexa_is_letter_1
+                               memory_0_1_hexa_is_digit_1:add al,30h            ;to transform it into ascii
+                                                 mov memory_0_1+2,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_memory_0_1_hexa_is_digit_or_letter_2
+                               memory_0_1_hexa_is_letter_1:sub al,9d
+                                                 add al,60h
+                                                 mov memory_0_1+2,al 
+                                                 jmp check_memory_0_1_hexa_is_digit_or_letter_2
+check_memory_0_1_hexa_is_digit_or_letter_2: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_memory_0_1_2
+                               jmp memory_0_1_hexa_is_letter_2
+
+                               check_upper_bound_value_memory_0_1_2:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe memory_0_1_hexa_is_digit_2
+                                                               jmp memory_0_1_hexa_is_letter_2
+                               memory_0_1_hexa_is_digit_2:add ah,30h            ;to transform it into ascii
+                                                 mov memory_0_1+3,ah     ; ah=32h --> =2d ; put directly into reg_Ax_1
+                                                 jmp check_done_memory_0_1_hexa_is_digit_or_letter
+                               memory_0_1_hexa_is_letter_2:sub ah,9d
+                                                 add ah,60h
+                                                 mov memory_0_1+3,ah 
+                                                 jmp check_done_memory_0_1_hexa_is_digit_or_letter
+                            check_done_memory_0_1_hexa_is_digit_or_letter:
+; checkthe entries of real_memory_1_1 are digits or letters
+check_memory_1_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_1_1
+mov ah, 00h
+mov al, ch; value of memory_1_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_1_1_1
+jmp memory_1_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_1_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_1_1_hexa_is_digit_1
+jmp memory_1_1_hexa_is_letter_1
+memory_1_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_1_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_1_1_hexa_is_digit_or_letter_2
+memory_1_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_1_1 + 2, al
+jmp check_memory_1_1_hexa_is_digit_or_letter_2
+check_memory_1_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_1_1_2
+jmp memory_1_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_1_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_1_1_hexa_is_digit_2
+jmp memory_1_1_hexa_is_letter_2
+memory_1_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_1_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_1_1_hexa_is_digit_or_letter
+memory_1_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_1_1 + 3, ah
+jmp check_done_memory_1_1_hexa_is_digit_or_letter
+check_done_memory_1_1_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_2_1 are digits or letters
+check_memory_2_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_2_1
+mov ah, 00h
+mov al, ch; value of memory_2_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_2_1_1
+jmp memory_2_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_2_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_2_1_hexa_is_digit_1
+jmp memory_2_1_hexa_is_letter_1
+memory_2_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_2_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_2_1_hexa_is_digit_or_letter_2
+memory_2_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_2_1 + 2, al
+jmp check_memory_2_1_hexa_is_digit_or_letter_2
+check_memory_2_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_2_1_2
+jmp memory_2_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_2_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_2_1_hexa_is_digit_2
+jmp memory_2_1_hexa_is_letter_2
+memory_2_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_2_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_2_1_hexa_is_digit_or_letter
+memory_2_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_2_1 + 3, ah
+jmp check_done_memory_2_1_hexa_is_digit_or_letter
+check_done_memory_2_1_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_3_1 are digits or letters
+check_memory_3_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_3_1
+mov ah, 00h
+mov al, ch; value of memory_3_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_3_1_1
+jmp memory_3_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_3_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_3_1_hexa_is_digit_1
+jmp memory_3_1_hexa_is_letter_1
+memory_3_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_3_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_3_1_hexa_is_digit_or_letter_2
+memory_3_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_3_1 + 2, al
+jmp check_memory_3_1_hexa_is_digit_or_letter_2
+check_memory_3_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_3_1_2
+jmp memory_3_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_3_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_3_1_hexa_is_digit_2
+jmp memory_3_1_hexa_is_letter_2
+memory_3_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_3_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_3_1_hexa_is_digit_or_letter
+memory_3_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_3_1 + 3, ah
+jmp check_done_memory_3_1_hexa_is_digit_or_letter
+check_done_memory_3_1_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_4_1 are digits or letters
+check_memory_4_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_4_1
+mov ah, 00h
+mov al, ch; value of memory_4_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_4_1_1
+jmp memory_4_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_4_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_4_1_hexa_is_digit_1
+jmp memory_4_1_hexa_is_letter_1
+memory_4_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_4_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_4_1_hexa_is_digit_or_letter_2
+memory_4_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_4_1 + 2, al
+jmp check_memory_4_1_hexa_is_digit_or_letter_2
+check_memory_4_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_4_1_2
+jmp memory_4_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_4_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_4_1_hexa_is_digit_2
+jmp memory_4_1_hexa_is_letter_2
+memory_4_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_4_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_4_1_hexa_is_digit_or_letter
+memory_4_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_4_1 + 3, ah
+jmp check_done_memory_4_1_hexa_is_digit_or_letter
+check_done_memory_4_1_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_5_1 are digits or letters
+check_memory_5_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_5_1
+mov ah, 00h
+mov al, ch; value of memory_5_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_5_1_1
+jmp memory_5_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_5_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_5_1_hexa_is_digit_1
+jmp memory_5_1_hexa_is_letter_1
+memory_5_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_5_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_5_1_hexa_is_digit_or_letter_2
+memory_5_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_5_1 + 2, al
+jmp check_memory_5_1_hexa_is_digit_or_letter_2
+check_memory_5_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_5_1_2
+jmp memory_5_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_5_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_5_1_hexa_is_digit_2
+jmp memory_5_1_hexa_is_letter_2
+memory_5_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_5_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_5_1_hexa_is_digit_or_letter
+memory_5_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_5_1 + 3, ah
+jmp check_done_memory_5_1_hexa_is_digit_or_letter
+check_done_memory_5_1_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_6_1 are digits or letters
+check_memory_6_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_6_1
+mov ah, 00h
+mov al, ch; value of memory_6_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_6_1_1
+jmp memory_6_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_6_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_6_1_hexa_is_digit_1
+jmp memory_6_1_hexa_is_letter_1
+memory_6_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_6_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_6_1_hexa_is_digit_or_letter_2
+memory_6_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_6_1 + 2, al
+jmp check_memory_6_1_hexa_is_digit_or_letter_2
+check_memory_6_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_6_1_2
+jmp memory_6_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_6_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_6_1_hexa_is_digit_2
+jmp memory_6_1_hexa_is_letter_2
+memory_6_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_6_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_6_1_hexa_is_digit_or_letter
+memory_6_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_6_1 + 3, ah
+jmp check_done_memory_6_1_hexa_is_digit_or_letter
+check_done_memory_6_1_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_7_1 are digits or letters
+check_memory_7_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_7_1
+mov ah, 00h
+mov al, ch; value of memory_7_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_7_1_1
+jmp memory_7_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_7_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_7_1_hexa_is_digit_1
+jmp memory_7_1_hexa_is_letter_1
+memory_7_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_7_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_7_1_hexa_is_digit_or_letter_2
+memory_7_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_7_1 + 2, al
+jmp check_memory_7_1_hexa_is_digit_or_letter_2
+check_memory_7_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_7_1_2
+jmp memory_7_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_7_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_7_1_hexa_is_digit_2
+jmp memory_7_1_hexa_is_letter_2
+memory_7_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_7_1 + 3, ah; ah = 32h-- > = 2d; put directly into memory_7_1
+jmp check_done_memory_7_1_hexa_is_digit_or_letter
+memory_7_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_7_1 + 3, ah
+jmp check_done_memory_7_1_hexa_is_digit_or_letter
+check_done_memory_7_1_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_8_1 are digits or letters
+check_memory_8_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_8_1
+mov ah, 00h
+mov al, ch; value of memory_8_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_8_1_1
+jmp memory_8_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_8_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_8_1_hexa_is_digit_1
+jmp memory_8_1_hexa_is_letter_1
+memory_8_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_8_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_8_1_hexa_is_digit_or_letter_2
+memory_8_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_8_1 + 2, al
+jmp check_memory_8_1_hexa_is_digit_or_letter_2
+check_memory_8_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_8_1_2
+jmp memory_8_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_8_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_8_1_hexa_is_digit_2
+jmp memory_8_1_hexa_is_letter_2
+memory_8_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_8_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_8_1_hexa_is_digit_or_letter
+memory_8_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_8_1 + 3, ah
+jmp check_done_memory_8_1_hexa_is_digit_or_letter
+check_done_memory_8_1_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_9_1 are digits or letters
+check_memory_9_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_9_1
+mov ah, 00h
+mov al, ch; value of memory_9_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_9_1_1
+jmp memory_9_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_9_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_9_1_hexa_is_digit_1
+jmp memory_9_1_hexa_is_letter_1
+memory_9_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_9_1 + 2, al; al = 31h-- > = 1d; put directly into memory_9_1
+jmp check_memory_9_1_hexa_is_digit_or_letter_2
+memory_9_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_9_1 + 2, al
+jmp check_memory_9_1_hexa_is_digit_or_letter_2
+check_memory_9_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_9_1_2
+jmp memory_9_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_9_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_9_1_hexa_is_digit_2
+jmp memory_9_1_hexa_is_letter_2
+memory_9_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_9_1 + 3, ah; ah = 32h-- > = 2d; put directly into memory_9_1
+jmp check_done_memory_9_1_hexa_is_digit_or_letter
+memory_9_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_9_1 + 3, ah
+jmp check_done_memory_9_1_hexa_is_digit_or_letter
+check_done_memory_9_1_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_A_1 are digits or letters
+check_memory_A_1_hexa_is_digit_or_letter_1 : mov ch, real_memory_A_1
+mov ah, 00h
+mov al, ch; value of memory_A_1-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_A_1_1
+jmp memory_A_1_hexa_is_letter_1
+
+check_upper_bound_value_memory_A_1_1 : mov bl, 9d
+cmp al, bl
+jbe memory_A_1_hexa_is_digit_1
+jmp memory_A_1_hexa_is_letter_1
+memory_A_1_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_A_1 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_A_1_hexa_is_digit_or_letter_2
+memory_A_1_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_A_1 + 2, al
+jmp check_memory_A_1_hexa_is_digit_or_letter_2
+check_memory_A_1_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_A_1_2
+jmp memory_A_1_hexa_is_letter_2
+
+check_upper_bound_value_memory_A_1_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_A_1_hexa_is_digit_2
+jmp memory_A_1_hexa_is_letter_2
+memory_A_1_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_A_1 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_A_1_hexa_is_digit_or_letter
+memory_A_1_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_A_1 + 3, ah
+jmp check_done_memory_A_1_hexa_is_digit_or_letter
+check_done_memory_A_1_hexa_is_digit_or_letter :
+
+;for memory2
+; checkthe entries of real_memory_0_2 are digits or letters
+check_memory_0_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_0_2
+mov ah, 00h
+mov al, ch; value of memory_0_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_0_2_1
+jmp memory_0_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_0_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_0_2_hexa_is_digit_1
+jmp memory_0_2_hexa_is_letter_1
+memory_0_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_0_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_0_2_hexa_is_digit_or_letter_2
+memory_0_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_0_2 + 2, al
+jmp check_memory_0_2_hexa_is_digit_or_letter_2
+check_memory_0_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_0_2_2
+jmp memory_0_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_0_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_0_2_hexa_is_digit_2
+jmp memory_0_2_hexa_is_letter_2
+memory_0_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_0_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_0_2_hexa_is_digit_or_letter
+memory_0_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_0_2 + 3, ah
+jmp check_done_memory_0_2_hexa_is_digit_or_letter
+check_done_memory_0_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_1_2 are digits or letters
+check_memory_1_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_1_2
+mov ah, 00h
+mov al, ch; value of memory_1_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_1_2_1
+jmp memory_1_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_1_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_1_2_hexa_is_digit_1
+jmp memory_1_2_hexa_is_letter_1
+memory_1_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_1_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_1_2_hexa_is_digit_or_letter_2
+memory_1_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_1_2 + 2, al
+jmp check_memory_1_2_hexa_is_digit_or_letter_2
+check_memory_1_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_1_2_2
+jmp memory_1_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_1_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_1_2_hexa_is_digit_2
+jmp memory_1_2_hexa_is_letter_2
+memory_1_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_1_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_1_2_hexa_is_digit_or_letter
+memory_1_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_1_2 + 3, ah
+jmp check_done_memory_1_2_hexa_is_digit_or_letter
+check_done_memory_1_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_2_2 are digits or letters
+check_memory_2_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_2_2
+mov ah, 00h
+mov al, ch; value of memory_2_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_2_2_1
+jmp memory_2_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_2_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_2_2_hexa_is_digit_1
+jmp memory_2_2_hexa_is_letter_1
+memory_2_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_2_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_2_2_hexa_is_digit_or_letter_2
+memory_2_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_2_2 + 2, al
+jmp check_memory_2_2_hexa_is_digit_or_letter_2
+check_memory_2_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_2_2_2
+jmp memory_2_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_2_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_2_2_hexa_is_digit_2
+jmp memory_2_2_hexa_is_letter_2
+memory_2_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_2_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_2_2_hexa_is_digit_or_letter
+memory_2_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_2_2 + 3, ah
+jmp check_done_memory_2_2_hexa_is_digit_or_letter
+check_done_memory_2_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_3_2 are digits or letters
+check_memory_3_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_3_2
+mov ah, 00h
+mov al, ch; value of memory_3_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_3_2_1
+jmp memory_3_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_3_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_3_2_hexa_is_digit_1
+jmp memory_3_2_hexa_is_letter_1
+memory_3_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_3_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_3_2_hexa_is_digit_or_letter_2
+memory_3_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_3_2 + 2, al
+jmp check_memory_3_2_hexa_is_digit_or_letter_2
+check_memory_3_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_3_2_2
+jmp memory_3_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_3_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_3_2_hexa_is_digit_2
+jmp memory_3_2_hexa_is_letter_2
+memory_3_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_3_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_3_2_hexa_is_digit_or_letter
+memory_3_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_3_2 + 3, ah
+jmp check_done_memory_3_2_hexa_is_digit_or_letter
+check_done_memory_3_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_4_2 are digits or letters
+check_memory_4_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_4_2
+mov ah, 00h
+mov al, ch; value of memory_4_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_4_2_1
+jmp memory_4_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_4_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_4_2_hexa_is_digit_1
+jmp memory_4_2_hexa_is_letter_1
+memory_4_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_4_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_4_2_hexa_is_digit_or_letter_2
+memory_4_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_4_2 + 2, al
+jmp check_memory_4_2_hexa_is_digit_or_letter_2
+check_memory_4_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_4_2_2
+jmp memory_4_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_4_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_4_2_hexa_is_digit_2
+jmp memory_4_2_hexa_is_letter_2
+memory_4_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_4_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_4_2_hexa_is_digit_or_letter
+memory_4_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_4_2 + 3, ah
+jmp check_done_memory_4_2_hexa_is_digit_or_letter
+check_done_memory_4_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_5_2 are digits or letters
+check_memory_5_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_5_2
+mov ah, 00h
+mov al, ch; value of memory_5_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_5_2_1
+jmp memory_5_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_5_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_5_2_hexa_is_digit_1
+jmp memory_5_2_hexa_is_letter_1
+memory_5_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_5_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_5_2_hexa_is_digit_or_letter_2
+memory_5_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_5_2 + 2, al
+jmp check_memory_5_2_hexa_is_digit_or_letter_2
+check_memory_5_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_5_2_2
+jmp memory_5_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_5_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_5_2_hexa_is_digit_2
+jmp memory_5_2_hexa_is_letter_2
+memory_5_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_5_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_5_2_hexa_is_digit_or_letter
+memory_5_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_5_2 + 3, ah
+jmp check_done_memory_5_2_hexa_is_digit_or_letter
+check_done_memory_5_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_6_2 are digits or letters
+check_memory_6_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_6_2
+mov ah, 00h
+mov al, ch; value of memory_6_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_6_2_1
+jmp memory_6_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_6_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_6_2_hexa_is_digit_1
+jmp memory_6_2_hexa_is_letter_1
+memory_6_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_6_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_6_2_hexa_is_digit_or_letter_2
+memory_6_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_6_2 + 2, al
+jmp check_memory_6_2_hexa_is_digit_or_letter_2
+check_memory_6_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_6_2_2
+jmp memory_6_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_6_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_6_2_hexa_is_digit_2
+jmp memory_6_2_hexa_is_letter_2
+memory_6_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_6_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_6_2_hexa_is_digit_or_letter
+memory_6_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_6_2 + 3, ah
+jmp check_done_memory_6_2_hexa_is_digit_or_letter
+check_done_memory_6_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_7_2 are digits or letters
+check_memory_7_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_7_2
+mov ah, 00h
+mov al, ch; value of memory_7_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_7_2_1
+jmp memory_7_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_7_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_7_2_hexa_is_digit_1
+jmp memory_7_2_hexa_is_letter_1
+memory_7_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_7_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_7_2_hexa_is_digit_or_letter_2
+memory_7_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_7_2 + 2, al
+jmp check_memory_7_2_hexa_is_digit_or_letter_2
+check_memory_7_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_7_2_2
+jmp memory_7_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_7_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_7_2_hexa_is_digit_2
+jmp memory_7_2_hexa_is_letter_2
+memory_7_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_7_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_7_2_hexa_is_digit_or_letter
+memory_7_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_7_2 + 3, ah
+jmp check_done_memory_7_2_hexa_is_digit_or_letter
+check_done_memory_7_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_8_2 are digits or letters
+check_memory_8_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_8_2
+mov ah, 00h
+mov al, ch; value of memory_8_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_8_2_1
+jmp memory_8_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_8_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_8_2_hexa_is_digit_1
+jmp memory_8_2_hexa_is_letter_1
+memory_8_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_8_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_8_2_hexa_is_digit_or_letter_2
+memory_8_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_8_2 + 2, al
+jmp check_memory_8_2_hexa_is_digit_or_letter_2
+check_memory_8_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_8_2_2
+jmp memory_8_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_8_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_8_2_hexa_is_digit_2
+jmp memory_8_2_hexa_is_letter_2
+memory_8_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_8_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_8_2_hexa_is_digit_or_letter
+memory_8_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_8_2 + 3, ah
+jmp check_done_memory_8_2_hexa_is_digit_or_letter
+check_done_memory_8_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_9_2 are digits or letters
+check_memory_9_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_9_2
+mov ah, 00h
+mov al, ch; value of memory_9_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_9_2_1
+jmp memory_9_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_9_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_9_2_hexa_is_digit_1
+jmp memory_9_2_hexa_is_letter_1
+memory_9_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_9_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_9_2_hexa_is_digit_or_letter_2
+memory_9_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_9_2 + 2, al
+jmp check_memory_9_2_hexa_is_digit_or_letter_2
+check_memory_9_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_9_2_2
+jmp memory_9_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_9_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_9_2_hexa_is_digit_2
+jmp memory_9_2_hexa_is_letter_2
+memory_9_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_9_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_9_2_hexa_is_digit_or_letter
+memory_9_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_9_2 + 3, ah
+jmp check_done_memory_9_2_hexa_is_digit_or_letter
+check_done_memory_9_2_hexa_is_digit_or_letter :
+; checkthe entries of real_memory_A_2 are digits or letters
+check_memory_A_2_hexa_is_digit_or_letter_1 : mov ch, real_memory_A_2
+mov ah, 00h
+mov al, ch; value of memory_A_2-- > 12h
+mov dl, 10h
+div dl; ans is in aland remainder in ah--->al = 1 ah = 2
+mov bl, 0d; lower range of numbers
+cmp al, bl
+jge check_upper_bound_value_memory_A_2_1
+jmp memory_A_2_hexa_is_letter_1
+
+check_upper_bound_value_memory_A_2_1 : mov bl, 9d
+cmp al, bl
+jbe memory_A_2_hexa_is_digit_1
+jmp memory_A_2_hexa_is_letter_1
+memory_A_2_hexa_is_digit_1 : add al, 30h; to transform it into ascii
+mov memory_A_2 + 2, al; al = 31h-- > = 1d; put directly into reg_Ax_1
+jmp check_memory_A_2_hexa_is_digit_or_letter_2
+memory_A_2_hexa_is_letter_1 : sub al, 9d
+add al, 60h
+mov memory_A_2 + 2, al
+jmp check_memory_A_2_hexa_is_digit_or_letter_2
+check_memory_A_2_hexa_is_digit_or_letter_2 :
+; compare if is between range of digits or no
+mov bl, 0d; lower range of numbers
+cmp ah, bl
+jge check_upper_bound_value_memory_A_2_2
+jmp memory_A_2_hexa_is_letter_2
+
+check_upper_bound_value_memory_A_2_2 : mov bl, 9d
+cmp ah, bl
+jbe memory_A_2_hexa_is_digit_2
+jmp memory_A_2_hexa_is_letter_2
+memory_A_2_hexa_is_digit_2 : add ah, 30h; to transform it into ascii
+mov memory_A_2 + 3, ah; ah = 32h-- > = 2d; put directly into reg_Ax_1
+jmp check_done_memory_A_2_hexa_is_digit_or_letter
+memory_A_2_hexa_is_letter_2 : sub ah, 9d
+add ah, 60h
+mov memory_A_2 + 3, ah
+jmp check_done_memory_A_2_hexa_is_digit_or_letter
+check_done_memory_A_2_hexa_is_digit_or_letter :
+
+                     ;***** k.y**************************************make macro if u want later k.y
 ret
 update_players_memory_values endp
 
@@ -1863,8 +4378,8 @@ update_players_memory_values endp
 ;memory player 1
        mov ah,2h ;
        mov bx,0h  
-       mov dx,0010h
-       mov di,dx
+       mov dx,0111h
+       mov di,dx ;needed in print inc x same y
        int 10h
        mov ah,9 ;print value of reg DI 2
        lea dx,memory_0_1+2 ;//done
@@ -1922,7 +4437,7 @@ update_players_memory_values endp
 ;memory player 2
 mov ah,2h ;
        mov bx,0h  
-       mov dx,0024h
+       mov dx,0125h
        mov di,dx
        int 10h
        mov ah,9 ;print value of reg DI 2
@@ -1981,7 +4496,6 @@ mov ah,2h ;
 
 ret
 print_memory_values endp
-
 function_taking_commands proc
  start:
         mov ah,9
