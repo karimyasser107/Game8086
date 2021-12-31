@@ -899,7 +899,7 @@ hlt
 	 ;////////////////// 
       check_if_value_105eh_in_ANY_reg_after_player_1_reg_2 proc
 ;mov ax,105eh
-mov real_reg_Ax_2,ax
+;mov real_reg_Ax_2,ax
        mov ax,ds
        mov es,ax
        mov si,offset real_reg_Ax_2
