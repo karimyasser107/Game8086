@@ -182,7 +182,7 @@ LEA si,[name1+2] ; the 1st letter of the name
      ;call dispname                    
      ;call newline1                   
      ;call enterusername
-jmp continue 
+jmp continue1 
 
 
 ; to display a message if name contain a number
@@ -220,7 +220,7 @@ jmp StartOfCode
 
  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; K.Elsheikh ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
-continue:     
+continue1:     
      
      call newline1 
      call newline1 
@@ -324,7 +324,7 @@ cmp            ah,f1
 
   CHECK_F2:                  
 cmp            ah,f2  
-jz game_mode
+jmp game_mode
 jnz            CHECK_ESC
 							   
 CHECK_ESC: 
@@ -594,7 +594,7 @@ Get_key_2:
 
 
 cmp            ah,f1  
- jz level_1
+ jmp level_1
 	                           
  jnz            CHECK_F2_2
 
@@ -898,7 +898,7 @@ hlt
         gameflow endp   
 	 ;////////////////// 
       check_if_value_105eh_in_ANY_reg_after_player_1_reg_2 proc
-mov ax,105eh
+;mov ax,105eh
 mov real_reg_Ax_2,ax
        mov ax,ds
        mov es,ax
