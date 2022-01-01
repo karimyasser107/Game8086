@@ -8891,7 +8891,7 @@ player1_p1 endp
  
 player1_p2 proc
 
-       cmp real_pts1,08d   ;to check if he has enough points to exexute
+       cmp real_pts1,08h   ;to check if he has enough points to exexute
        jb points1_lessthan_30  
   
        sub  real_pts1 ,08h
