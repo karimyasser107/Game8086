@@ -8856,13 +8856,13 @@ int 21h
 player1_p1 proc
  
   
-  cmp real_pts1,30d     ;to check if he has enough points to exexute
+  cmp real_pts1,30h     ;to check if he has enough points to exexute
   jb points1_lessthan_30
  
 
 inc counter1
   
-sub  real_pts1 ,30d
+sub  real_pts1 ,30h
 
 mov real_reg_Ax_1     ,  0000h
 mov real_reg_Bx_1     ,  0000h
@@ -8894,7 +8894,7 @@ player1_p2 proc
        cmp real_pts1,08d   ;to check if he has enough points to exexute
        jb points1_lessthan_30  
   
-       sub  real_pts1 ,08d
+       sub  real_pts1 ,08h
 
        mov ah,9           ; display message
        LEA dx,enter_forbiddenchar 
