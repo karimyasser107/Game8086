@@ -4,35 +4,71 @@
 .DATA
 mes1 db 'Please enter your name:','$'
 points db 'Initial points:','$'
-mes2 db  'Please press enter to continue','$'
+mes2 db  'Please press Enter to continue','$'                                   ;//changed 31/12/2021
 chatting db 'To start chatting Press F1','$'
 game     db 'To start the game Press F2','$'
 endprogram db 'To end the program press ESC','$'
 ErrorJumpKey db 'Please enter a correct choice:','$'
 Contain_Digit_Mess db 'Name can not contain Digits:','$'
 contain_Special_Mess db 'Name can not contain Special characters:','$'
-separate  db  80 dup('-'),'$'
-newline db ,10,13,'$'
-pts1    db 6,?,6 dup('$')
-name1 db 16,?,16 dup('$')
-pts2    db 6,?,6 dup('$')
-pts_total   db ?
-name2 db 16,?,16 dup('$') 
 ;winners messages 
-player_wins_disp db ' is WINNER !','$'
-player_points_disp db ' Points','$'
+player_wins_disp db 'WINNER is:','$'                                               ;//changed 31/12/2021
+points_for_player_mes db 'his/her Points:','$'                                           ;//changed 31/12/2021
  
 ;loosers messages 
-player_looses_disp db ' is Looser ;(','$'
+player_looses_disp db 'Looser :','$'                                          ;//changed 31/12/2021
+separate  db  80 dup('-'),'$'
+newline db ,10,13,'$'
+mess_incorrect_pts_and_reenter db 'Incorrect points ! (points must be 2 digits number)','$'    ;changed//31/12/2021
+                                                                 ;//changed 31/12/2021
+name1 db 16,?,16 dup('$'),'$' 
+ name2 db 16,?,16 dup('$') ,'$'                                                      ;//changed 31/12/2021
+enterKey_to_return_main_menu db  'ccEnter key to return to main menu','$'
 
+pts1    db 3,?,3 dup('$'),'$'                                                 ;//changed 31/12/2021
+real_pts1 db ?  
+pts2    db 3,?,3 dup('$'),'$' 
+real_pts2 db ?                                                                  ;//changed 31/12/2021
+pts_total   db ? 
 ;message to return to main menu
-enterKey_to_return_main_menu db  'Enter key to return to main menu','$'  
+  
 f1                     db  61
 f2                     db  60   
+f3                     db  61
 ;message for level menu
 Level1     db  'For Level 1 Press f1','$'
 Level2     db  'For Level 2 press f2','$'
 
+;//////////////////////////sara$sond
+ counter1 db 0  ;counter for player1_p1
+ counter2 db 0  ;counter for player2_p1 
+ counter_for_players db 0
+ 
+
+;newline db ,10,13,'$'
+forbidden_char db 2,?,2 dup('$'), '$'
+enter_forbiddenchar        db  'enter forbidden char: ','$'
+disp_forbiddenchar         db  'your forbidden char is : ','$'
+error_points1_lessthan_08 db  'points player 1 less than 8','$'
+error_points1_lessthan_30 db 'points player 1 less than 30','$'
+
+commands   db  'Commands: 1','$'
+powerups   db  ' Powerups: 2 ','$'
+p1         db  'power up 1 press(A) for (30 pts). ','$'
+p2         db  'power up 2 press(B) for (8 pts). ','$'
+p3         db  'power up 3 press(C) for (5 pts). ','$'
+p4         db  'power up 4 press(D) for (3 pts). ','$'  
+
+p1_2         db  'power up 1 press(x) for (30 pts). ','$'
+p2_2         db  'power up 2 press(y) for (8 pts). ','$'
+p3_2         db  'power up 3 press(z) for (5 pts). ','$'
+p4_2         db  'power up 4 press(f) for (3 pts). ','$'
+
+A                  db  1EH;for player1  
+B                  db  30h 
+
+x                  db  2DH;for player2
+y                  db  15H
 
 semicolumn db ':','$'
 ;vars for processor 1 (NECESSARY for input and output ONLY)
@@ -291,9 +327,7 @@ continue2:
      call disp_intial_points
      call newline1      
      
-     mov ah,0Ah         ; for entering initial points
-     LEA dx, pts2
-     int 21h     
+     call enter_initial_points_2    
      
      call newline1
      call newline1
@@ -371,16 +405,14 @@ jmp Get_key
               
               
               
-     checkenter_key proc               
-                   
-mov ah,0      ;check if enter key is pressed
+     checkenter_key proc                                                                     ;changed 31/12/2021
+again_enter_enter_key:                  
+mov ah,00h      ;user enter a key 
 int 16h
-mov bl,1ch
-cmp ah,bl
- 
+mov bl,0Dh ;  'enter' ascii
+cmp al,bl
+jnz again_enter_enter_key
 
-
-  
       ret
      
      checkenter_key endp  
@@ -398,21 +430,118 @@ int 21h
      
       disp_enter endp
  
-              ;//////////////////
+              ;////////////////// 
                  
-      enter_initial_points proc           
+      enter_initial_points proc                                                            ;changed 31/12/2021
                  
 mov ah,0Ah         ; for entering initial points
 LEA dx, pts1
 int 21h
+
+call check_initial_points_digit_letter_player_1                                              ;changed 31/12/2021
          
-      ret
-     
+      ret 
       enter_initial_points endp
-    
+           ;////////////////// 
                  
+      enter_initial_points_2 proc                                                            ;changed 31/12/2021
+                 
+mov ah,0Ah         ; for entering initial points
+LEA dx, pts2
+int 21h
+
+call check_initial_points_digit_letter_player_2                                              ;changed 31/12/2021
+         
+      ret 
+      enter_initial_points_2 endp
+
+     ;//////////////////
+check_initial_points_digit_letter_player_1 proc
+       mov al,pts1+2 ;first digit in pts1
+       mov bl,30h
+       cmp al,bl
+       jae check_upper_bound_digit_in_pts1_1
+       jmp incorrect_pts1_show_message
+       check_upper_bound_digit_in_pts1_1: mov bl,39h
+                                   cmp al,bl 
+                                   jbe correct_first_digit_pts1_check_second_digit
+                                   jmp incorrect_pts1_show_message
+       correct_first_digit_pts1_check_second_digit:                         ;second digit in pts1
+              mov al,pts1+3 ;first digit in pts1
+              mov bl,30h
+              cmp al,bl
+              jae check_upper_bound_digit_in_pts1_2
+              jmp incorrect_pts1_show_message
+              check_upper_bound_digit_in_pts1_2: mov bl,39h
+                                   cmp al,bl
+                                   jbe correct_second_digit_correct_pts1
+                                   jmp incorrect_pts1_show_message
+       correct_second_digit_correct_pts1:mov al,pts1+2                      ;tenth
+                                          sub al,30h 
+                                          mov ah,00d
+                                          mov dl,10h                        ;tenth needs to be multiplied by 10
+                                          mul dl 
+                                          mov real_pts1,al                    ;put the correct tenth value of pts1 in real_pts1
+                                          ;repeat for units value in pts1
+                                          mov al,pts1+3
+                                          sub al,30h
+                                          mov ah,00h
+                                          
+                                          add real_pts1,al                      ;add the units on the tenth of pts1
+                                          ret
+
+       incorrect_pts1_show_message: mov ah,9h 
+                                   lea dx,mess_incorrect_pts_and_reenter
+                                   int 21h
+                                   jmp continue1
+
+ ret 
+check_initial_points_digit_letter_player_1 endp   
+
+     ;//////////////////
+check_initial_points_digit_letter_player_2 proc                   ;changed//31/12/2021
+       mov al,pts2+2 ;first digit in pts1
+       mov bl,30h
+       cmp al,bl
+       jae check_upper_bound_digit_in_pts2_1
+       jmp incorrect_pts2_show_message
+       check_upper_bound_digit_in_pts2_1: mov bl,39h
+                                   cmp al,bl 
+                                   jbe correct_first_digit_pts2_check_second_digit
+                                   jmp incorrect_pts2_show_message
+       correct_first_digit_pts2_check_second_digit:                         ;second digit in pts1
+              mov al,pts2+3 ;first digit in pts1
+              mov bl,30h
+              cmp al,bl
+              jae check_upper_bound_digit_in_pts2_2
+              jmp incorrect_pts2_show_message
+              check_upper_bound_digit_in_pts2_2: mov bl,39h
+                                   cmp al,bl
+                                   jbe correct_second_digit_correct_pts2
+                                   jmp incorrect_pts2_show_message
+       correct_second_digit_correct_pts2:mov al,pts2+2                      ;tenth
+                                          sub al,30h 
+                                          mov ah,00d
+                                          mov dl,10h                        ;tenth needs to be multiplied by 10
+                                          mul dl 
+                                          mov real_pts2,al                    ;put the correct tenth value of pts1 in real_pts2
+                                          ;repeat for units value in pts1
+                                          mov al,pts2+3
+                                          sub al,30h
+                                          mov ah,00h
+                                          
+                                          add real_pts2,al                      ;add the units on the tenth of pts2
+                                          ret
+
+       incorrect_pts2_show_message: mov ah,9h 
+                                   lea dx,mess_incorrect_pts_and_reenter
+                                   int 21h
+                                   jmp continue2
+
+ ret 
+check_initial_points_digit_letter_player_2 endp  
               ;//////////////////
-                    
+
     disp_intial_points proc    
                  
  mov ah,9           ; display message for entering initial points
@@ -733,8 +862,8 @@ hlt
      call print_register_values ;to be removed and put it in gameflow
      call update_players_memory_values ;;to be removed and put it in gameflow
      call print_memory_values ;;to be removed and put it in gameflow
-      
-    
+     call update_points_values 
+     call print_points_values_p1_p2
       
       
        ;#####################################################print names
@@ -763,8 +892,9 @@ hlt
       int 21h
       
       ;check points to choose the smaller points for both players
-      mov al,pts1+2
-      mov ah,pts2+2
+      call update_points_values
+      mov al,real_pts1
+      mov ah,real_pts2
       cmp ah,al         
       
       jnz pts2_or_pts1 
@@ -775,11 +905,11 @@ hlt
                     jnc   pts1_smaller    
                     
                     pts2_smaller: mov pts_total,ah          ;  points 2 smaller
-                                  mov [pts1+2],ah
+                                  mov real_pts1,ah
                                   jmp finished_total_points    
                                   
                     pts1_smaller: mov pts_total,al          ;  points 1 smaller
-                                  mov [pts2+2],al
+                                  mov real_pts2,al
                     
       finished_total_points:
       call gameflow 
@@ -788,32 +918,37 @@ hlt
      gamemodesetup endp 
         
       ;//////////////////
-      gameflow proc   
+      gameflow proc                                                                           ;updated 31/12/2021
             
         ;loop until one player points =0 then game ended
-       whileNoWinner: mov al,pts1+2
-                       mov ah,pts2+2
-                       cmp al,0h         ;check player 1 points =0 then P1 looser, P2 winner
-                       jnz checkPlayer1_points
-                       call player2_winner
-                       jmp finish_game        
+       whileNoWinner: ;mov al,pts1+2
+                       ;mov ah,pts2+2
+                       ;cmp al,0h         ;check player 1 points =0 then P1 looser, P2 winner
+                       ;jnz checkPlayer1_points
+                       ;call player2_winner
+                       ;jmp finish_game        
                        
-                       checkPlayer1_points: cmp ah,0h                  ;check player 2 points =0 then P2 looser, P1 winner
-                                            jnz continue_game_no_winner
-                                            call player1_winner
-                                            jmp finish_game  
+                       ;checkPlayer1_points: cmp ah,0h                  ;check player 2 points =0 then P2 looser, P1 winner
+                         ;                   jnz continue_game_no_winner
+                        ;                    call player1_winner
+                       ;                     jmp finish_game  
               
                                             
                                             
-                       continue_game_no_winner:
-                       call update_players_memory_values
-                       call update_players_registers_values
-                       call print_register_values
-                       call print_memory_values
+                      ; continue_game_no_winner:
+                      ; call update_players_memory_values
+                      ; call update_players_registers_values
+                      ; call print_register_values
+                      ; call print_memory_values
 
 
-                       ;user enters here the command he wants
-		       call function_taking_commands
+                     ;player 1 starts his turn, he enters here the command or the power up he wants or hits the flying objects
+		       call display_commands_or_powerups_menu    ;disp the menu of player1
+                     call get_key_commands_or_powerups 
+                     jmp finish_turn_player1
+                            finish_turn_player1:
+
+                            ;update screen, check if player 1 won? , then player2 turn 
                                             ; dummy to try to recieve data from user in graphic mode
     ;mov bx,0h  ;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
     ;mov ah,2     ;move cursor
@@ -829,15 +964,18 @@ hlt
  ;    mov ah,0Ah
   ;   LEA dx, enter_command
    ;  int 21h     
-     
-                        ;to print on screen
-                        call update_players_memory_values
+
+                       ;to print on screen updated values
+                       call update_players_memory_values
                        call update_players_registers_values
+                       call update_points_values
+
                        call print_register_values
                        call print_memory_values
+                       call print_points_values_p1_p2
                        ;check if the points of a player is zero or a player entered required value in the register
-                       mov al,pts1+2
-                       mov ah,pts2+2
+                       mov al,real_pts1
+                       mov ah,real_pts2
                        cmp al,0h         ;check player 1 points =0 then P1 looser, P2 winner
                        jnz checkPlayer1_points_after_player_1
                        call player2_winner
@@ -849,23 +987,29 @@ hlt
                                             jmp finish_game 
                      continue_game_no_winner_after_player_1: 
 
-                     call check_if_value_105eh_in_ANY_reg_after_player_1_reg_2
-                     jnz continue_game_no_winner_after_check_reg_2_required_value
-                      jz player2_winner
-                      jmp finish_game
+                     ;check if player 1 entered the required value to win in any of the opponent registers
+                     call check_if_value_requiered_to_WIN_in_ANY_reg_after_player_1_reg_2
+                     ;jnz continue_game_no_winner_after_check_reg_2_required_value
+                      
+                      ;jmp finish_game
                        ;game logic                     
                      continue_game_no_winner_after_check_reg_2_required_value:
 
-                     ;player 2 enters the comand he wats
+                     ;player 2 starts his turn, he enters here the command or the power up he wants or hits the flying objects
+;we will put here fn  kareem ragab like this *****
+;call display_commands_or_powerups_menu    ;disp the menu of player1
+;call get_key_commands_or_powerups 
+;jmp finish_turn_player1
+;finish_turn_player1:
 
-                     ;to print on screen
+                     ;to print on screen updated values
                         call update_players_memory_values
                        call update_players_registers_values
                        call print_register_values
                        call print_memory_values
                                             ;check if the points of a player is zero or a player entered required value in the register
-                       mov al,pts1+2
-                       mov ah,pts2+2
+                       mov al,real_pts1
+                       mov ah,real_pts2
                        cmp al,0h         ;check player 1 points =0 then P1 looser, P2 winner
                        jnz checkPlayer1_points_after_player_2
                        call player2_winner
@@ -876,11 +1020,13 @@ hlt
                                             call player1_winner
                                             jmp finish_game 
                      continue_game_no_winner_after_player_2: 
-                     call check_if_value_105eh_in_ANY_reg_after_player_2_reg_1
-                      jnz continue_game_no_winner_after_check_reg_1_required_value
-                      jz player1_winner
-                      jmp finish_game
-                       ;game logic                     
+
+                     ;check if player 2 entered the required value to win in any of the opponent registers
+                     call check_if_value_requiered_to_WIN_in_ANY_reg_after_player_2_reg_1
+                      ;jnz continue_game_no_winner_after_check_reg_1_required_value
+                      ;call player2_winner
+                      ;jmp finish_game
+                                        
                      continue_game_no_winner_after_check_reg_1_required_value:
 
         
@@ -897,217 +1043,403 @@ hlt
         ret
         gameflow endp   
 	 ;////////////////// 
-      check_if_value_105eh_in_ANY_reg_after_player_1_reg_2 proc
+      check_if_value_requiered_to_WIN_in_ANY_reg_after_player_1_reg_2 proc                      ;updated 31/12/2021
 ;mov ax,105eh
 ;mov real_reg_Ax_2,ax
+
+;if requiered value to win is in reag Ax_2
        mov ax,ds
        mov es,ax
        mov si,offset real_reg_Ax_2
        mov di,offset value_in_REG_to_win
        mov cx,4h
        cmpsw 
-       jz player1_winner
-;continue all reg_2
+       jnz continue_game_no_winner_after_check_reg_2_required_value
+      call player1_winner 
+       jmp  finish_game
 
+;if requiered value to win is in reag Bx_2
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_Bx_2
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_2_required_value
+       call player1_winner
+       jmp finish_game 
+
+;if requiered value to win is in reag Cx_2
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_Cx_2
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_2_required_value
+       call player1_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag Dx_2
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_Dx_2
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_2_required_value
+       call player1_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag SI_2
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_SI_2
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_2_required_value
+       call player1_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag DI_2
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_DI_2
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_2_required_value
+       call player1_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag SP_2
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_SP_2
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_2_required_value
+       call player1_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag BP_2
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_BP_2
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_2_required_value
+       call player1_winner
+       jmp finish_game 
+      
 ret
-check_if_value_105eh_in_ANY_reg_after_player_1_reg_2 endp
+check_if_value_requiered_to_WIN_in_ANY_reg_after_player_1_reg_2 endp
 
          ;////////////////// 
-check_if_value_105eh_in_ANY_reg_after_player_2_reg_1 proc
+check_if_value_requiered_to_WIN_in_ANY_reg_after_player_2_reg_1 proc                          ;updated 31/12/2021
+;if requiered value to win is in reag Ax_1
        mov ax,ds
-
        mov es,ax
        mov si,offset real_reg_Ax_1
        mov di,offset value_in_REG_to_win
        mov cx,4h
        cmpsw 
-      
-;continue all reg_1
+       jnz continue_game_no_winner_after_check_reg_1_required_value
+      call player2_winner
+       jmp  finish_game
+
+;if requiered value to win is in reag Bx_1
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_Bx_1
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_1_required_value
+       call player2_winner
+       jmp finish_game 
+
+;if requiered value to win is in reag Cx_1
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_Cx_1
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_1_required_value
+       call player2_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag Dx_1
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_Dx_1
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_1_required_value
+       call player2_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag SI_1
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_SI_1
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_1_required_value
+       call player2_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag DI_1
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_DI_1
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_1_required_value
+       call player2_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag SP_1
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_SP_1
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_1_required_value
+       call player2_winner
+       jmp finish_game 
+       
+;if requiered value to win is in reag BP_1
+       mov ax,ds
+       mov es,ax
+       mov si,offset real_reg_BP_1
+       mov di,offset value_in_REG_to_win
+       mov cx,4h
+       cmpsw 
+       jnz continue_game_no_winner_after_check_reg_1_required_value
+       call player2_winner
+       jmp finish_game 
 
 ret
-check_if_value_105eh_in_ANY_reg_after_player_2_reg_1 endp
+check_if_value_requiered_to_WIN_in_ANY_reg_after_player_2_reg_1 endp
 
          ;////////////////// 
          
          player2_winner proc  
-            
-            call clear
-            call print_Middle_graphic_screen ;move cursor middle of screen 
-            
-            
-            mov ah,9           ; display winner: player 2 name 
-            LEA dx, name2+2
-            int 21h
-            mov ax,0 
-            
-            mov ah,9           ; display winner message
-            LEA dx, player_wins_disp+2
-            int 21h
-            mov ax,0     
-                   
-            call  print_sameX_incY 
-            call  print_sameX_incY
-            
-            mov ah,9           ; display winner: player 2 name 
-            LEA dx, name2+2
-            int 21h
-            mov ax,0
-            
-             mov ah,9           ; display winner: player 2  points remaining
-            LEA dx, pts2+2
-            int 21h
-            mov ax,0            
-            
-            mov ah,9           ; display word 'points' 
-            LEA dx, player_points_disp+2
-            int 21h
-            mov ax,0 
-            
-            call  print_sameX_incY      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-            call  print_sameX_incY 
-            call  print_sameX_incY
-            
-            mov ah,9           ; display looser: player 1 name 
-            LEA dx, name1+2
-            int 21h
-            mov ax,0 
-            
-            mov ah,9           ; display looser message
-            LEA dx, player_looses_disp+2
-            int 21h
-            mov ax,0     
-                   
-            call  print_sameX_incY 
-            call  print_sameX_incY  
-            
-            mov ah,9           ; display looserr: player 1 name 
-            LEA dx, name1+2
-            int 21h
-            mov ax,0
-            
-             mov ah,9           ; display looser: player 1  points == 0
-            mov dx,'0'
-            int 21h
-            mov ax,0  
-            
-            mov ah,9           ; display word 'points' 
-            LEA dx, player_points_disp+2
-            int 21h
-            mov ax,0            
-            
-            call  print_sameX_incY      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-            call  print_sameX_incY
-            call  print_sameX_incY  
-            
-              
-            
-            mov ah,9           ; display enterKey_to_return_main_menu
-            LEA dx, enterKey_to_return_main_menu+2
-            int 21h
-            mov ax,0       
-            
-            
-            
-            mov ah,0   ;Get key pressed 
-            int 16h
-            mov bl,09h
-            cmp al,bl
-            mov bl,0 
-            mov al,0 
-                         
-                         
+  
+              ;go to text mode                                                                        31/12/2021
+              mov ah,0
+              mov al,3
+              int 10h
+;move cursor           
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0505h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ah,9           ; display winner message
+              LEA dx, player_wins_disp
+              int 21h  
+;move cursor
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0516h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ah,9           ; display winner: player 2 name 
+              lea dx,name2+2
+              int 21h
+              mov ax,0h
+;move cursor           
+              mov bx,0h 
+              mov ah,2     ;move cursor
+              mov dx,0705h     ;the midlle of the screen 0718h
+              ; mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ah,9           ; display word 'points' 
+              LEA dx,points_for_player_mes
+              int 21h
+;move cursor
+              mov ax,0 
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0716h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ah,9           ; display winner: player 2  points remaining
+              LEA dx, [pts2]+2
+              int 21h
+              mov ax,0            
+;move cursor            
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0b05h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
              
+              mov ah,9           ; display looser message
+              LEA dx, player_looses_disp
+              int 21h
+;move cursor
+              mov ax,0    
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0b16h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h 
+
+              mov ah,9           ; display looser: player 1 name 
+              LEA dx, [name1]+2
+              int 21h
+              mov ax,0 
+;move cursor
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0c05h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ax,0h
+              mov ah,9           ; display word 'points' 
+              LEA dx, points_for_player_mes
+              int 21h
+;move cursor
+              mov ax,0  
+              mov ah,2     ;move cursor
+              mov dx,0c16h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h 
+
+              mov ah,9           ; display looser: player 1  
+              lea dx, pts1+2
+              int 21h
             
+            call  newline1
+            call  newline1           
+            call  newline1
+            call  newline1  
+;to wait user see the winner/looser page           
+            call disp_enter 
+            call checkenter_key
+
             ret
             player2_winner endp
          
          ;//////////////////    
          
          player1_winner proc
-            
-            call clear
-            call print_Middle_graphic_screen ;move cursor middle of screen 
-            
-            
-            mov ah,9           ; display winner: player 1 name 
-            LEA dx, name1+2
-            int 21h
-            mov ax,0 
-            
-            mov ah,9           ; display winner message
-            LEA dx, player_wins_disp+2
-            int 21h
-            mov ax,0     
-                   
-            call  print_sameX_incY 
-            call  print_sameX_incY
-            
-            mov ah,9           ; display winner: player 1 name 
-            LEA dx, name1+2
-            int 21h
-            mov ax,0
-            
-             mov ah,9           ; display winner: player 1  points remaining
-            LEA dx, pts1+2
-            int 21h
-            mov ax,0            
-            
-            mov ah,9           ; display word 'points' 
-            LEA dx, player_points_disp+2
-            int 21h
-            mov ax,0 
-            
-            call  print_sameX_incY      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-            call  print_sameX_incY
-            call  print_sameX_incY
-            
-            mov ah,9           ; display looser: player 2 name 
-            LEA dx, name2+2
-            int 21h
-            mov ax,0 
-            
-            mov ah,9           ; display looser message
-            LEA dx, player_looses_disp+2
-            int 21h
-            mov ax,0     
-                   
-            call  print_sameX_incY 
-            call  print_sameX_incY  
-            
-            mov ah,9           ; display looserr: player 2 name 
-            LEA dx, name2+2
-            int 21h
-            mov ax,0
-            
-             mov ah,9           ; display looser: player 2  points == 0
-            mov dx,'0'
-            int 21h
-            mov ax,0  
-            
-            mov ah,9           ; display word 'points' 
-            LEA dx, player_points_disp+2
-            int 21h
-            mov ax,0            
-            
-            call  print_sameX_incY      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-            call  print_sameX_incY  
-            call  print_sameX_incY
+  
+              ;go to text mode                                                                        31/12/2021
+              mov ah,0
+              mov al,3
+              int 10h
+;move cursor           
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0505h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ah,9           ; display winner message
+              LEA dx, player_wins_disp
+              int 21h  
+;move cursor
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0516h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ah,9           ; display winner: player 1 name 
+              lea dx,name1+2
+              int 21h
+              mov ax,0h
+;move cursor           
+              mov bx,0h 
+              mov ah,2     ;move cursor
+              mov dx,0705h     ;the midlle of the screen 0718h
+              ; mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ah,9           ; display word 'points' 
+              LEA dx,points_for_player_mes
+              int 21h
+;move cursor
+              mov ax,0 
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0716h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ah,9           ; display winner: player 1  points remaining
+              LEA dx, [pts1]+2
+              int 21h
+              mov ax,0            
+;move cursor            
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0b05h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
              
+              mov ah,9           ; display looser message
+              LEA dx, player_looses_disp
+              int 21h
+;move cursor
+              mov ax,0    
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0b16h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h 
+
+              mov ah,9           ; display looser: player 2 name 
+              LEA dx, [name2]+2
+              int 21h
+              mov ax,0 
+;move cursor
+              mov bx,0h  
+              mov ah,2     ;move cursor
+              mov dx,0c05h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h
+
+              mov ax,0h
+              mov ah,9           ; display word 'points' 
+              LEA dx, points_for_player_mes
+              int 21h
+;move cursor
+              mov ax,0  
+              mov ah,2     ;move cursor
+              mov dx,0c16h     ;the midlle of the screen 0718h
+              ;mov di,dx ;to protect the last starting location 
+              int 10h 
+
+              mov ah,9           ; display looser: player 2 
+              lea dx, pts2+2
+              int 21h
             
-            mov ah,9           ; display enterKey_to_return_main_menu
-            LEA dx, enterKey_to_return_main_menu+2
-            int 21h
-            mov ax,0       
-            
-           
-            
-            mov ah,0   ;Get key pressed 
-            int 16h
-            mov bl,09h
-            cmp al,bl
-            mov bl,0 
-            mov al,0 
-            
+            call  newline1
+            call  newline1           
+            call  newline1
+            call  newline1  
+;to wait user see the winner/looser page           
+            call disp_enter 
+            call checkenter_key
+
             ret
             player1_winner endp 
          
@@ -1305,7 +1637,116 @@ jnz loop92
     ret
     Checks_For_Name_2  endp           
 ;///////////////////////////////////////////////////////&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& ky
+;////////////////////////////////// screen display functions (registers, memory, names, points)          ;//changed 31/12/2021
+;//////////////////
+update_points_values proc                                                                                ;//changed 31/12/2021
+       mov al,0Dh ;ascii of 'Enter'
+       mov pts1+4,al
+       ;checkthe entries of pts1 are digits or letters
+check_pts1_is_digit_or_letter_1: mov ch,real_pts1
+                               mov ah,00d
+                               mov al,ch ;value of pts1  --> 12h
+                               mov dl,10h
+                               div dl ;ans is in al and remainder in ah ---> al=1 ah=2
+                               ;mov bl, 0d ;lower range of numbers
+                               ;cmp al,bl
+                               ;jae check_upper_bound_value_pts1_1
+                               ;jmp pts1_1_hexa_is_letter_1
 
+                               ;check_upper_bound_value_pts1_1:    mov bl,9d
+                                ;                               cmp al,bl
+                                 ;                              jbe pts1_hexa_is_digit_1
+                                  ;                             jmp pts1_hexa_is_letter_1
+                               pts1_1_hexa_is_digit_1:add al,30h            ;to transform it into ascii
+                                                 mov pts1+2,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 ;jmp check_pts1_hexa_is_digit_or_letter_2
+                               ;pts1_1_hexa_is_letter_1:sub al,9d
+                                ;                 add al,60h
+                                 ;                mov pts1+2,al 
+                                  ;               jmp check_pts1_hexa_is_digit_or_letter_2
+check_pts1_hexa_is_digit_or_letter_2: 
+                               ;compare if is between range of digits or no
+                               ;mov bl, 0d ;lower range of numbers
+                               ;cmp ah,bl
+                               ;jae check_upper_bound_value_pts1_2
+                               ;jmp pts1_hexa_is_letter_2
+
+                               ;check_upper_bound_value_pts1_2:    mov bl,9d
+                                ;                               cmp ah,bl
+                                 ;                              jbe pts1_hexa_is_digit_2
+                                  ;                             jmp pts1_hexa_is_letter_2
+                               pts1_hexa_is_digit_2:add ah,30h            ;to transform it into ascii
+                                                 mov pts1+3,ah     ; ah=32h --> =2d ; put directly into reg_Ax_1
+                                   ;              jmp check_done_pts1_hexa_is_digit_or_letter
+                               ;pts1_hexa_is_letter_2:sub ah,9d
+                                ;                 add ah,60h
+                                 ;                mov pts1+3,ah 
+                                  ;               jmp check_done_pts1_hexa_is_digit_or_letter
+                            ;check_done_pts1_hexa_is_digit_or_letter:
+;pts2
+mov ch,real_pts2
+                               mov ah,00d
+                               mov al,ch ;value of pts1  --> 12h
+                               mov dl,10h
+                               div dl
+
+                               add al,30h            ;to transform it into ascii
+                                                 mov pts2+2,al
+
+                            add ah,30h            ;to transform it into ascii
+                                                 mov pts2+3,ah 
+ret
+update_points_values endp 
+
+;//////////////////
+print_points_values_p1_p2 proc 
+;player 1                                                                          ;//changed 31/12/2021
+       mov bx,0h  
+        mov ah,2     ;move cursor to begining of screen
+        mov dx,0001h
+        int 10h 
+        ;print name1
+      mov ah,9                   ;disp name 1
+      Lea dx, [name1+2]
+      int 21h
+      mov bx,0h  
+        mov ah,2     ;move cursor to up of register 1
+        mov dx,0009h
+        int 10h 
+       ;print semicolom points
+      mov ah,9               ;disp :
+     lea dx, semicolumn
+      int 21h
+      ;points 1
+      mov ah,9               ;disp points
+      lea dx, pts1+2
+      int 21h
+
+ ;player 2     
+       mov bx,0h  
+        mov ah,2     ;move cursor to up of register 2
+        mov dx,0016h
+        int 10h 
+      mov ah,9           ;disp name 2
+      Lea dx, [name2+2]
+      int 21h
+       ;print semicolom points
+       mov bx,0h  
+        mov ah,2     ;move cursor to begining of screen
+        mov dx,0021h
+        int 10h 
+      mov ah,9               ;disp :
+      lea dx, semicolumn
+      int 21h
+      ;points 2
+      mov ah,9               ;disp points player 2
+      lea dx, pts2+2
+      int 21h 
+         
+ret
+print_points_values_p1_p2 endp
+
+;//////////////////
     print_registers_boxes proc
     ;///reg of player 1 
     ;reg ax 1
@@ -8330,6 +8771,198 @@ jmp getRegisterName_bh_sub_op2
 continue:
 ret
 function_taking_commands endp
-      
+
+;//////////s@s
+display_commands_or_powerups_menu  proc
+    
+    
+                 
+mov ah,9            
+mov dx,offset commands
+int 21h  
+
+mov ah,9            
+mov dx,offset powerups
+int 21h  
+        
+                    
+                 ret
+     
+   display_commands_or_powerups_menu  endp  
+
+
+get_key_commands_or_powerups   proc 
+   
+     
+startin_get_key_commands_powerups:
+
+     
+mov ah,0      ;check if key is pressed
+int 16h
+
+cmp al,31h ;number 1 ascii 
+jz hewants_command ;change jmp to jz
+jmp other_than_f2
+hewants_command:call function_taking_commands
+          
+                     jmp finish_turn_player1
+
+ other_than_f2:
+cmp al,32h ; 2 ascii
+jnz  startin_get_key_commands_powerups  ;change jmp to jnz
+call get_key_powerups
+
+ret
+ 
+    
+    ret
+  get_key_commands_or_powerups  endp
+;/////////////////////////////////////////////
+    
+display_powerups_menu proc
+
+        
+
+mov ah,9            
+mov dx,offset p1
+int 21h   
+
+
+  call newLine1 
+
+        
+mov ah,9            
+mov dx,offset p2
+int 21h 
+
+  call newLine1 
+
+
+        
+mov ah,9            
+mov dx,offset p3
+int 21h 
+
+  call newLine1  
+        
+mov ah,9            
+mov dx,offset p4
+int 21h 
+
+          ret
+          display_powerups_menu endp 
+          ;////////////////////////////////////
+
+player1_p1 proc
+ 
+  
+  cmp real_pts1,30d     ;to check if he has enough points to exexute
+  jb points1_lessthan_30
+ 
+
+inc counter1
+  
+sub  real_pts1 ,30d
+
+mov real_reg_Ax_1     ,  0000h
+mov real_reg_Bx_1     ,  0000h
+mov real_reg_BP_1     ,  0000h
+mov real_reg_cx_1     ,  0000h
+mov real_reg_dx_1     ,  0000h
+mov real_reg_di_1     ,  0000h
+mov real_reg_si_1     ,  0000h
+mov real_reg_sp_1     ,  0000h  
+mov real_reg_BP_1     ,  0000h
+ 
+mov real_reg_Ax_2     ,  0000h
+mov real_reg_Bx_2     ,  0000h
+mov real_reg_BP_2     ,  0000h
+mov real_reg_cx_2     ,  0000h
+mov real_reg_dx_2     ,  0000h
+mov real_reg_di_2     ,  0000h
+mov real_reg_si_2     ,  0000h
+mov real_reg_sp_2     ,  0000h  
+mov real_reg_BP_2     ,  0000h
+
+ret
+player1_p1 endp
+
+
+ 
+player1_p2 proc
+
+       cmp real_pts1,08d   ;to check if he has enough points to exexute
+       jb points1_lessthan_30  
+  
+       sub  real_pts1 ,08d
+
+       mov ah,9           ; display message
+       LEA dx,enter_forbiddenchar 
+       int 21h    
+                                   ; for entering forbidden char 
+       mov ah,0Ah
+       LEA dx,  forbidden_char 
+       int 21h  
+
+       mov ah,9           ; display mess forbidden_char 
+       LEA dx,disp_forbiddenchar
+       int 21h   
+
+       mov ah,9           ; display forbidden_char 
+       LEA dx,forbidden_char+2
+       int 21h   
+       jmp finish_turn_player1
+    
+    points1_lessthan_30:
+    mov ah , 9
+    mov dx , offset error_points1_lessthan_30
+    int 21h
+    jmp finish_turn_player1
+    ret
+
+    points1_lessthan_08:
+    mov ah , 9
+    mov dx , offset error_points1_lessthan_08
+    int 21h
+    jmp finish_turn_player1
+    ret
+
+   player1_p2 endp
+;////////powerup 1//////////////////////////
+
+get_key_powerups   proc  
+
+
+       call display_powerups_menu     ;disp the menu of player1
+
+       start_get_key_power_up_fn:
+              mov ah,0      ;wait user key press
+              int 16h 
+              cmp al,41h  ;ascci A 
+              jnz check_if_power_up_a_small
+              call player1_p1
+              ret
+
+       check_if_power_up_a_small:
+              cmp al,61h ; ascii a
+              jnz not_first_power_up_player1
+              call player1_p1
+              ret
+
+       not_first_power_up_player1: 
+              cmp al,62h  ;ascii b
+              jnz check_if_power_up_b_capital
+              call player1_p2
+              jmp finish_turn_player1
+
+       check_if_power_up_b_capital:
+              cmp al,62h  ;ascii b
+              jnz start_get_key_power_up_fn
+              call player1_p2
+              jmp finish_turn_player1
+
+ret
+get_key_powerups  endp 
+
 
      end main 
