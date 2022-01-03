@@ -23,7 +23,7 @@ points_for_player_mes db 'his/her Points:','$'                                  
 player_looses_disp db 'Looser :','$'                                          ;//changed 31/12/2021
 separate  db  80 dup('-'),'$'
 newline db ,10,13,'$'
-mess_incorrect_pts_and_reenter db 'Incorrect points ! (points must be 2 digits number)','$'    ;changed//31/12/2021
+mess_incorrect_pts_and_reenter db 'Incorrect points ! (points must be 2 hexa digits number)','$'    ;changed//31/12/2021
                                                                  ;//changed 31/12/2021
 name1 db 16,?,16 dup('$'),'$' 
  name2 db 16,?,16 dup('$') ,'$'                                                      ;//changed 31/12/2021
@@ -435,9 +435,20 @@ int 21h
 mov ah,0Ah         ; for entering initial points
 LEA dx, pts1
 int 21h
-
+call print_sameX_incY
+;check that entered value is 2  digits
+mov ah,pts1+1
+mov al,02h
+cmp ah,al
+jz correct_2_digits_init_pts1_player_1
+jmp incorrect_pts1_show_message
+ incorrect_pts1_show_message: mov ah,9h 
+                                   lea dx,mess_incorrect_pts_and_reenter
+                                   int 21h
+                                   call print_sameX_incY
+                                   jmp continue1
+correct_2_digits_init_pts1_player_1:
 call check_initial_points_digit_letter_player_1                                              ;changed 31/12/2021
-         
       ret 
       enter_initial_points endp
            ;////////////////// 
@@ -447,7 +458,18 @@ call check_initial_points_digit_letter_player_1                                 
 mov ah,0Ah         ; for entering initial points
 LEA dx, pts2
 int 21h
-
+;check that entered points is 2  digits
+mov ah,pts2+1
+mov al,02h
+cmp ah,al
+jz correct_2_digits_init_pts2_player_2
+jmp incorrect_pts2_show_message
+ incorrect_pts2_show_message: mov ah,9h 
+                                   lea dx,mess_incorrect_pts_and_reenter
+                                   int 21h
+                                   call print_sameX_incY
+                                   jmp continue2
+correct_2_digits_init_pts2_player_2:
 call check_initial_points_digit_letter_player_2                                              ;changed 31/12/2021
          
       ret 
@@ -456,87 +478,111 @@ call check_initial_points_digit_letter_player_2                                 
      ;//////////////////
 check_initial_points_digit_letter_player_1 proc near 
        mov al,pts1+2 ;first digit in pts1
-       mov bl,30h
-       cmp al,bl
-       jae check_upper_bound_digit_in_pts1_1
-       jmp incorrect_pts1_show_message
-       check_upper_bound_digit_in_pts1_1: mov bl,39h
-                                   cmp al,bl 
-                                   jbe correct_first_digit_pts1_check_second_digit
-                                   jmp incorrect_pts1_show_message
-       correct_first_digit_pts1_check_second_digit:                         ;second digit in pts1
-              mov al,pts1+3 ;first digit in pts1
-              mov bl,30h
-              cmp al,bl
-              jae check_upper_bound_digit_in_pts1_2
-              jmp incorrect_pts1_show_message
-              check_upper_bound_digit_in_pts1_2: mov bl,39h
-                                   cmp al,bl
-                                   jbe correct_second_digit_correct_pts1
-                                   jmp incorrect_pts1_show_message
-       correct_second_digit_correct_pts1:mov al,pts1+2                      ;tenth
-                                          sub al,30h 
-                                          mov ah,00d
-                                          mov dl,10h                        ;tenth needs to be multiplied by 10
-                                          mul dl 
-                                          mov real_pts1,al                    ;put the correct tenth value of pts1 in real_pts1
-                                          ;repeat for units value in pts1
-                                          mov al,pts1+3
-                                          sub al,30h
-                                          mov ah,00h
-                                          
-                                          add real_pts1,al                      ;add the units on the tenth of pts1
-                                          ret
+       mov ah,30h  ;lower range of digits
+       cmp al,ah
+       jae check_upperbound_initial_pts1_p1_value_1
+       jb initial_pts1_p1_value_entered_is_letters_1
 
-       incorrect_pts1_show_message: mov ah,9h 
-                                   lea dx,mess_incorrect_pts_and_reenter
-                                   int 21h
-                                   call print_sameX_incY
-                                   jmp continue1
+       check_upperbound_initial_pts1_p1_value_1:
+              mov ah,39h ;upper range of digits
+              cmp al,ah 
+              jbe initial_pts1_p1_value_entered_is_digit_1
+              ja initial_pts1_p1_value_entered_is_letters_1
 
+initial_pts1_p1_value_entered_is_letters_1:
+       sub al, 60h
+       add al, 9h
+       mov bl, 10h
+       mul bl
+       mov ch, al
+       jmp check_value_initial_pts1_p1_2
+
+initial_pts1_p1_value_entered_is_digit_1:
+       sub al, 30h
+       mov bl, 10h
+       mul bl
+       mov ch, al 
+
+check_value_initial_pts1_p1_2:
+mov al, pts1+ 3
+mov ah,30h ;lower range of digits
+cmp al,ah
+jae check_upperbound_initial_pts1_p1_value_2
+jb initial_pts1_p1_value_entered_is_letters_2
+
+       check_upperbound_initial_pts1_p1_value_2:
+              mov ah,39h ;upper range of digits
+              cmp al,ah 
+              jbe initial_pts1_p1_value_entered_is_digit_2
+              ja initial_pts1_p1_value_entered_is_letters_2
+
+initial_pts1_p1_value_entered_is_letters_2:
+       sub al, 60h
+       add al, 9h
+       add ch, al 
+       jmp finish_check_value_initial_pts1_p1
+
+initial_pts1_p1_value_entered_is_digit_2:
+       sub al, 30h
+       add ch, al      
+finish_check_value_initial_pts1_p1:
+mov real_pts1,ch
  ret 
 check_initial_points_digit_letter_player_1 endp   
 
      ;//////////////////
 check_initial_points_digit_letter_player_2 proc   near                  ;changed//31/12/2021
        mov al,pts2+2 ;first digit in pts1
-       mov bl,30h
-       cmp al,bl
-       jae check_upper_bound_digit_in_pts2_1
-       jmp incorrect_pts2_show_message
-       check_upper_bound_digit_in_pts2_1: mov bl,39h
-                                   cmp al,bl 
-                                   jbe correct_first_digit_pts2_check_second_digit
-                                   jmp incorrect_pts2_show_message
-       correct_first_digit_pts2_check_second_digit:                         ;second digit in pts1
-              mov al,pts2+3 ;first digit in pts1
-              mov bl,30h
-              cmp al,bl
-              jae check_upper_bound_digit_in_pts2_2
-              jmp incorrect_pts2_show_message
-              check_upper_bound_digit_in_pts2_2: mov bl,39h
-                                   cmp al,bl
-                                   jbe correct_second_digit_correct_pts2
-                                   jmp incorrect_pts2_show_message
-       correct_second_digit_correct_pts2:mov al,pts2+2                      ;tenth
-                                          sub al,30h 
-                                          mov ah,00d
-                                          mov dl,10h                        ;tenth needs to be multiplied by 10
-                                          mul dl 
-                                          mov real_pts2,al                    ;put the correct tenth value of pts1 in real_pts2
-                                          ;repeat for units value in pts1
-                                          mov al,pts2+3
-                                          sub al,30h
-                                          mov ah,00h
-                                          
-                                          add real_pts2,al                      ;add the units on the tenth of pts2
-                                          ret
+       mov ah,30h  ;lower range of digits
+       cmp al,ah
+       jae check_upperbound_initial_pts2_p2_value_1
+       jb initial_pts2_p2_value_entered_is_letters_1
 
-       incorrect_pts2_show_message: mov ah,9h 
-                                   lea dx,mess_incorrect_pts_and_reenter
-                                   int 21h
-                                   call print_sameX_incY
-                                   jmp continue2
+       check_upperbound_initial_pts2_p2_value_1:
+              mov ah,39h ;upper range of digits
+              cmp al,ah 
+              jbe initial_pts2_p2_value_entered_is_digit_1
+              ja initial_pts2_p2_value_entered_is_letters_1
+
+initial_pts2_p2_value_entered_is_letters_1:
+       sub al, 60h
+       add al, 9h
+       mov bl, 10h
+       mul bl
+       mov ch, al
+       jmp check_value_initial_pts2_p2_2
+
+initial_pts2_p2_value_entered_is_digit_1:
+       sub al, 30h
+       mov bl, 10h
+       mul bl
+       mov ch, al 
+
+check_value_initial_pts2_p2_2:
+mov al, pts2 + 3
+mov ah,30h ;lower range of digits
+cmp al,ah
+jae check_upperbound_initial_pts2_p2_value_2
+jb initial_pts2_p2_value_entered_is_letters_2
+
+       check_upperbound_initial_pts2_p2_value_2:
+              mov ah,39h ;upper range of digits
+              cmp al,ah 
+              jbe initial_pts2_p2_value_entered_is_digit_2
+              ja initial_pts2_p2_value_entered_is_letters_2
+
+initial_pts2_p2_value_entered_is_letters_2:
+       sub al, 60h
+       add al, 9h
+       add ch, al 
+       jmp finish_check_value_initial_pts2_p2
+
+initial_pts2_p2_value_entered_is_digit_2:
+       sub al, 30h
+       add ch, al      
+finish_check_value_initial_pts2_p2:
+mov real_pts2,ch
+ ret 
 
  ret 
 check_initial_points_digit_letter_player_2 endp  
@@ -1933,30 +1979,88 @@ print_forbidden_char_level_1 endp
 update_points_values proc     near                                                                           ;//changed 1/1/2022
        mov al,0Dh ;ascii of 'Enter'
        mov pts1+4,al
+       mov pts2+4,al
        ;checkthe entries of pts1 are digits or letters
-check_pts1_is_digit_or_letter_1: mov ch,real_pts1
-                               mov ah,00d
-                               mov al,ch ;value of pts1  --> 12h
+check_points_1_hexa_is_digit_or_letter_1:
+                               mov ch,real_pts1 
+                               mov ah,00h
+                               mov al,ch ;pts2   --> 12h
                                mov dl,10h
                                div dl ;ans is in al and remainder in ah ---> al=1 ah=2
-                               
-                              add al,30h            ;to transform it into ascii
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_points_1_1
+                               jmp points_1_hexa_is_letter_1
+
+                               check_upper_bound_value_points_1_1:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe points_1_hexa_is_digit_1
+                                                               jmp points_1_hexa_is_letter_1
+                               points_1_hexa_is_digit_1:add al,30h            ;to transform it into ascii
                                                  mov pts1+2,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_points_1_hexa_is_digit_or_letter_2
+                               points_1_hexa_is_letter_1:sub al,9d
+                                                 add al,60h
+                                                 mov pts1+2,al 
+                                                 jmp check_points_1_hexa_is_digit_or_letter_2
+check_points_1_hexa_is_digit_or_letter_2: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_points_1_2
+                               jmp points_1_hexa_is_letter_2
 
-                               add ah,30h            ;to transform it into ascii
+                               check_upper_bound_value_points_1_2:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe points_1_hexa_is_digit_2
+                                                               jmp points_1_hexa_is_letter_2
+                               points_1_hexa_is_digit_2:add ah,30h            ;to transform it into ascii
                                                  mov pts1+3,ah     ; ah=32h --> =2d ; put directly into reg_Ax_1
-                                 
-;pts2
-mov ch,real_pts2
-                               mov ah,00d
-                               mov al,ch ;value of pts1  --> 12h
+                                                 jmp check_points_2_hexa_is_digit_or_letter_1
+                               points_1_hexa_is_letter_2:sub ah,9d
+                                                 add ah,60h
+                                                 mov pts1+3,ah 
+                                                 jmp check_points_2_hexa_is_digit_or_letter_1
+
+       ;checkthe entries of pts1 are digits or letters
+check_points_2_hexa_is_digit_or_letter_1: 
+                            mov ch,real_pts2 
+                               mov ah,00h
+                               mov al,ch ;higher part of reg Ax_1  --> 12h
                                mov dl,10h
-                               div dl
+                               div dl ;ans is in al and remainder in ah ---> al=1 ah=2
+                               mov bl, 0d ;lower range of numbers
+                               cmp al,bl
+                               jge check_upper_bound_value_points_2_1
+                               jmp points_2_hexa_is_letter_1
 
-                               add al,30h            ;to transform it into ascii
-                                                 mov pts2+2,al
+                               check_upper_bound_value_points_2_1:    mov bl,9d
+                                                               cmp al,bl
+                                                               jbe points_2_hexa_is_digit_1
+                                                               jmp points_2_hexa_is_letter_1
+                               points_2_hexa_is_digit_1:add al,30h            ;to transform it into ascii
+                                                 mov pts2+2,al     ; al=31h --> =1d ; put directly into reg_Ax_1
+                                                 jmp check_points_2_hexa_is_digit_or_letter_2
+                               points_2_hexa_is_letter_1:sub al,9d
+                                                 add al,60h
+                                                 mov pts2+2,al 
+                                                 jmp check_points_2_hexa_is_digit_or_letter_2
+check_points_2_hexa_is_digit_or_letter_2: 
+                               ;compare if is between range of digits or no
+                               mov bl, 0d ;lower range of numbers
+                               cmp ah,bl
+                               jge check_upper_bound_value_points_2_2
+                               jmp points_2_hexa_is_letter_2
 
-                            add ah,30h            ;to transform it into ascii
+                               check_upper_bound_value_points_2_2:    mov bl,9d
+                                                               cmp ah,bl
+                                                               jbe points_2_hexa_is_digit_2
+                                                               jmp points_2_hexa_is_letter_2
+                               points_2_hexa_is_digit_2:add ah,30h            ;to transform it into ascii
+                                                 mov pts2+3,ah     ; ah=32h --> =2d ; put directly into reg_Ax_1
+                                                 ret
+                               points_2_hexa_is_letter_2:sub ah,9d
+                                                 add ah,60h
                                                  mov pts2+3,ah 
 ret
 update_points_values endp 
